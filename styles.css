@@ -70,10 +70,67 @@ img.history1 {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.P4Pcontent {
+    background: white;
+    color: #194419;
+    font-weight: bold;
+    text-decoration: none;
+    width: 40%;
+    max-height: 30px;
+    font-size: 20px;
+    padding: 8px;
+    margin: 50px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+a:link {
+    text-decoration: none;
+}
+
 .hero {
     display: flex;
     align-items: center;
 }
+
+img.historyheader {
+    width: 100%;
+}
+
+.ontop {
+    position: relative;
+    text-align: center;
+    color: white;
+  }
+
+  .center {
+    font-size: 100px;
+    font-weight: bold;
+    color: #194419;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .center1 {
+    font-size: 50px;
+    font-weight: bold;
+    color: #ffffff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .center2 {
+    font-size: 100px;
+    font-weight: bold;
+    color: #ffffff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 
 .headerhis {
     font-size: 20px;
