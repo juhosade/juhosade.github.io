@@ -41,6 +41,15 @@ nav a:hover {
     padding: 20px 0;
 }
 
+.containerP4P {
+    display: flex;
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+    align-items: center;
+    padding: 20px 0;
+}
+
 img.heropic {
     width: auto;
     max-width: 150px;
@@ -75,6 +84,8 @@ img.history1 {
     color: #194419;
     font-weight: bold;
     text-decoration: none;
+    display: flex;
+    align-items: center;
     width: 40%;
     max-height: 30px;
     font-size: 20px;
@@ -83,6 +94,22 @@ img.history1 {
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
+.P4Pcontentheros {
+    background: white;
+    color: #194419;
+    font-weight: bold;
+    text-decoration: none;
+    display: block;
+    align-items: center;
+    width: 40%;
+    font-size: 20px;
+    padding: 20px;
+    margin: 50px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
 a:link {
     text-decoration: none;
 }
@@ -94,6 +121,12 @@ a:link {
 
 img.historyheader {
     width: 100%;
+}
+
+img.P4Phero {
+    max-height: 400px;
+    display: flex;
+    align-items: center;
 }
 
 .ontop {
@@ -159,4 +192,77 @@ footer {
     padding: 10px 0;
     border-top: 5px solid #ffd700;
     margin-top: 20px;
+}
+
+.fighter-profile {
+    background-color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+.fighter-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fighter-image {
+    max-width: 200px;
+    margin-right: 20px;
+}
+
+.fighter-info {
+    text-align: left;
+    color: #194419;
+}
+
+.record {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.record div {
+    text-align: center;
+}
+
+.fight-history {
+    margin-top: 20px;
+}
+
+.spotlight {
+    background-color: #fff;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.spotlight-videos {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.video {
+    max-width: 300px;
+    margin: 10px;
+}
+
+.stats {
+    background-color: #fff;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.stats-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.stat {
+    flex: 1 1 30%;
+    background-color: #f0f0f0;
+    margin: 10px;
+    padding: 10px;
+    text-align: center;
 }
