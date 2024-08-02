@@ -26,10 +26,10 @@
             <div class="results-table">
                 <table id="eventResultsTable">
                     <thead>
-                        <!-- Table headers will be inserted here dynamically -->
+
                     </thead>
                     <tbody>
-                        <!-- Data will be dynamically inserted here -->
+
                     </tbody>
                 </table>
             </div>
@@ -41,9 +41,9 @@
     </footer>
 
     <script>
-        const API_KEY = 'AIzaSyDD90a2fkngn3OCYwJpijcZtyWwohmWJ8Q'; // Replace with your actual API key
-        const SHEET_ID = '1VmCpTWbrkG5XXCjxoXsAb6mGIcIVIrlj4e-YrnmSwq4'; // Replace with your actual sheet ID
-        const rangesA1 = ['Taulukko1!A1:J1', 'Taulukko1!A2:J20']; // Adjust ranges based on your needs
+        const API_KEY = 'AIzaSyDD90a2fkngn3OCYwJpijcZtyWwohmWJ8Q'; 
+        const SHEET_ID = '1VmCpTWbrkG5XXCjxoXsAb6mGIcIVIrlj4e-YrnmSwq4'; 
+        const rangesA1 = ['Taulukko1!A1:J1', 'Taulukko1!A2:J20']; 
 
         async function fetchData() {
             try {
@@ -77,8 +77,8 @@
             const tableHead = document.querySelector('#eventResultsTable thead');
             const tableBody = document.querySelector('#eventResultsTable tbody');
 
-            // Create table headers from the first range
-            const headers = data[0].values[0]; // First row contains headers
+ 
+            const headers = data[0].values[0]; 
             const headerRow = document.createElement('tr');
             headers.forEach(header => {
                 const th = document.createElement('th');
@@ -87,10 +87,9 @@
             });
             tableHead.appendChild(headerRow);
 
-            // Create table rows from the subsequent ranges
             data.forEach((range, index) => {
-                if (index === 0) return; // Skip the first range which is used for headers
-                range.values.slice(1).forEach(row => { // Skip the first row (headers)
+                if (index === 0) return; 
+                range.values.slice(1).forEach(row => {
                     const rowElement = document.createElement('tr');
                     row.forEach(cell => {
                         const cellElement = document.createElement('td');
