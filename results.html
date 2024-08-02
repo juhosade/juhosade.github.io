@@ -23,161 +23,90 @@
         <div class="content">
             <h2>Tulokset</h2>
 
-            <h3>Event Results</h3>
             <div class="results-table">
                 <table id="eventResultsTable">
                     <thead>
-                        <tr>
-                            <th>Competitor</th>
-                            <th>Event 1</th>
-                            <th>Event 2</th>
-                            <th>Event 3</th>
-                            <th>Event 4</th>
-                            <th>Event 5</th>
-                            <th>Event 6</th>
-                            <th>Event 7</th>
-                            <th>Event 8</th>
-                            <th>Event 9</th>
-                            <th>Event 10</th>
-                            <th>Total Score</th>
-                        </tr>
+                        <!-- Table headers will be inserted here dynamically -->
                     </thead>
                     <tbody>
                         <!-- Data will be dynamically inserted here -->
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
 
     <footer>
         <p>&copy; 2024 Dokathlon. Kaikki oikeudet pidätetään.</p>
     </footer>
 
     <script>
-        async function fetchSheetData() {
-            const apiKey = 'AIzaSyDD90a2fkngn3OCYwJpijcZtyWwohmWJ8Q'; // Replace with your API key
-            const spreadsheetId = '1VmCpTWbrkG5XXCjxoXsAb6mGIcIVIrlj4e-YrnmSwq4'; // Replace with your spreadsheet ID
+        const API_KEY = 'AIzaSyDD90a2fkngn3OCYwJpijcZtyWwohmWJ8Q'; // Replace with your actual API key
+        const SHEET_ID = '1VmCpTWbrkG5XXCjxoXsAb6mGIcIVIrlj4e-YrnmSwq4'; // Replace with your actual sheet ID
+        const rangesA1 = ['Taulukko1!A1:J1', 'Taulukko1!A2:J20']; // Adjust ranges based on your needs
 
-            const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values?key=${apiKey}`;
-
+        async function fetchData() {
             try {
-                const response = await fetch(url, { mode: 'no-cors' });
+                // Join ranges for API call
+                const rangeParams = rangesA1.map(range => `ranges=${encodeURIComponent(range)}`).join('&');
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values:batchGet?${rangeParams}&key=${API_KEY}`;
+                const response = await fetch(url);
+                
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    throw new Error(`Error: ${response.status} ${response.statusText}`);
                 }
-                const json = await response.json();
-                console.log('Fetched data:', json); // Log raw JSON data
-                return json.values;
+
+                const data = await response.json();
+                if (data && data.valueRanges) {
+                    return data.valueRanges;
+                } else {
+                    throw new Error('No data found or data structure is incorrect.');
+                }
             } catch (error) {
                 console.error('Error fetching data:', error);
-                return []; // Return empty array on error
+                return null;
             }
         }
 
-        function parseHTML(htmlText) {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlText, 'text/html');
-            const table = doc.querySelector('table'); // Adjust selector if necessary
-            const rows = table.querySelectorAll('tr');
-            const data = [];
-            
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td, th');
-                const rowData = Array.from(cells).map(cell => cell.textContent.trim());
-                data.push(rowData);
-            });
-            
-            console.log('Parsed data:', data); // Log parsed data
-            return data;
-        }
+        function populateTable(data) {
+            if (!data || data.length === 0) {
+                console.error('No data available to populate the table.');
+                return;
+            }
 
-        function displayEventResults(data) {
+            const tableHead = document.querySelector('#eventResultsTable thead');
             const tableBody = document.querySelector('#eventResultsTable tbody');
-            tableBody.innerHTML = ''; // Clear existing rows
 
-            if (data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="12">No data available</td></tr>';
-                return;
-            }
+            // Create table headers from the first range
+            const headers = data[0].values[0]; // First row contains headers
+            const headerRow = document.createElement('tr');
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            tableHead.appendChild(headerRow);
 
-            data.forEach((row, index) => {
-                if (index === 0) return; // Skip header row
-
-                const tr = document.createElement('tr');
-                row.forEach((col, colIndex) => {
-                    const td = document.createElement('td');
-                    td.textContent = col;
-
-                    if (colIndex === row.length - 1) {
-                        const totalScore = row.slice(1, -1).reduce((a, b) => a + parseFloat(b) || 0, 0);
-                        td.textContent = totalScore;
-                    }
-
-                    tr.appendChild(td);
+            // Create table rows from the subsequent ranges
+            data.forEach((range, index) => {
+                if (index === 0) return; // Skip the first range which is used for headers
+                range.values.slice(1).forEach(row => { // Skip the first row (headers)
+                    const rowElement = document.createElement('tr');
+                    row.forEach(cell => {
+                        const cellElement = document.createElement('td');
+                        cellElement.textContent = cell;
+                        rowElement.appendChild(cellElement);
+                    });
+                    tableBody.appendChild(rowElement);
                 });
-                tableBody.appendChild(tr);
             });
         }
 
-        function calculatePoints(data) {
-            const competitors = data.slice(1); // Skip header row
-
-            let competitorsData = competitors.map(row => ({
-                name: row[0], // Assuming name is in the first column
-                scores: row.slice(1, -1), // Scores for each event
-                totalScore: parseFloat(row[row.length - 1]) // Total score is the last column
-            }));
-
-            competitorsData.sort((a, b) => b.totalScore - a.totalScore);
-
-            competitorsData = competitorsData.map((competitor, index) => ({
-                ...competitor,
-                points: competitorsData.length - index, // 1st place gets highest points
-                eventsWon: 0 // Placeholder, replace with actual calculation if needed
-            }));
-
-            return competitorsData;
-        }
-
-        function displayLeaderboard(pointData) {
-            const tableBody = document.querySelector('#leaderboardTable tbody');
-            tableBody.innerHTML = ''; // Clear existing rows
-
-            pointData.forEach((entry, index) => {
-                const tr = document.createElement('tr');
-
-                const rankTd = document.createElement('td');
-                rankTd.textContent = index + 1; // Rank starts from 1
-                tr.appendChild(rankTd);
-
-                const nameTd = document.createElement('td');
-                nameTd.textContent = entry.name;
-                tr.appendChild(nameTd);
-
-                const pointsTd = document.createElement('td');
-                pointsTd.textContent = entry.points;
-                tr.appendChild(pointsTd);
-
-                const eventsWonTd = document.createElement('td');
-                eventsWonTd.textContent = entry.eventsWon;
-                tr.appendChild(eventsWonTd);
-
-                tableBody.appendChild(tr);
-            });
-        }
-
-        async function init() {
-            const data = await fetchSheetData();
-            if (data.length === 0) {
-                console.error('No data found');
-                return;
-            }
-            displayEventResults(data);
-            const pointData = calculatePoints(data);
-            displayLeaderboard(pointData);
-        }
-
-        // Initialize the page with data
-        init();
+        fetchData().then(data => {
+            populateTable(data);
+        }).catch(error => {
+            console.error('Error processing data:', error);
+        });
     </script>
 </body>
 </html>
