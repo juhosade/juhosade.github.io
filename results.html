@@ -23,13 +23,43 @@
         <div class="content">
             <h2>Tulokset</h2>
 
+            <!-- Existing table for event results -->
             <div class="results-table">
                 <table id="eventResultsTable">
                     <thead>
-
+                        <tr>
+                            <!-- Headers for each event will be dynamically added -->
+                        </tr>
                     </thead>
                     <tbody>
+                        <!-- Rows will be populated here -->
+                    </tbody>
+                </table>
+            </div>
 
+            <!-- New table for points -->
+            <div class="points-table">
+                <h3>Pisteet</h3>
+                <table id="pointsTable">
+                    <thead>
+                        <tr>
+                            <th>Osallistuja</th>
+                            <!-- Headers for 10 events and total points -->
+                            <th>Bilis</th>
+                            <th>Draiverin heitto</th>
+                            <th>Flipcup</th>
+                            <th>Mölkky</th>
+                            <th>Kaljapiilo</th>
+                            <th>Tikka</th>
+                            <th>Loopin louie</th>
+                            <th>Petankki</th>
+                            <th>Tarkkuuskaljometri</th>
+                            <th>Suplautailu</th>
+                            <th>Pisteet yht.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be populated here -->
                     </tbody>
                 </table>
             </div>
@@ -43,7 +73,7 @@
     <script>
         const API_KEY = 'AIzaSyDD90a2fkngn3OCYwJpijcZtyWwohmWJ8Q'; 
         const SHEET_ID = '1VmCpTWbrkG5XXCjxoXsAb6mGIcIVIrlj4e-YrnmSwq4'; 
-        const rangesA1 = ['Taulukko1!A1:J1', 'Taulukko1!A2:J20']; 
+        const rangesA1 = ['Taulukko1!A1:T1', 'Taulukko1!A2:T20']; // Updated range to include 10 events
 
         async function fetchData() {
             try {
@@ -68,45 +98,121 @@
             }
         }
 
-        function populateTable(data) {
+        function calculatePoints(results) {
+            const points = {};
+            const eventCount = results[0].length - 1; // Number of events
+
+            // Determine event types (1 means smallest value wins, 0 means largest value wins)
+            const eventTypes = [1, 0, 1, 0, 1, 0, 0, 0, 0, 1]; // Corresponds to each event in order
+
+            // Initialize points object for each participant
+            results.forEach(row => {
+                const participant = row[0];
+                const scores = row.slice(1).map(score => score ? Number(score) : 0);
+
+                if (!points[participant]) {
+                    points[participant] = {
+                        totalPoints: 0,
+                        eventPoints: Array(eventCount).fill(0) // Points per event
+                    };
+                }
+
+                points[participant].scores = scores;
+            });
+
+            // Calculate points for each event
+            for (let eventIndex = 0; eventIndex < eventCount; eventIndex++) {
+                const eventScores = Object.entries(points).map(([participant, data], idx) => ({
+                    participant,
+                    score: data.scores[eventIndex]
+                }));
+
+                // Sort event scores: ascending if smallest wins, descending if largest wins
+                eventScores.sort((a, b) => eventTypes[eventIndex] ? a.score - b.score : b.score - a.score);
+
+                let currentPoints = 17;
+                let lastScore = null;
+                let tieCount = 0;
+
+                eventScores.forEach((entry, idx) => {
+                    const { participant, score } = entry;
+
+                    if (score === 0) {
+                        points[participant].eventPoints[eventIndex] = 0;
+                        return;
+                    }
+
+                    if (score !== lastScore) {
+                        currentPoints -= tieCount; // Decrement current points by tie count
+                        lastScore = score;
+                        tieCount = 0;
+                    }
+
+                    points[participant].eventPoints[eventIndex] = currentPoints;
+                    points[participant].totalPoints += currentPoints;
+                    tieCount++;
+                });
+
+                // Adjust the next starting points based on the number of ties
+                currentPoints -= tieCount - 1;
+            }
+
+            return points;
+        }
+
+        function populateTables(data) {
             if (!data || data.length === 0) {
-                console.error('No data available to populate the table.');
+                console.error('No data available to populate the tables.');
                 return;
             }
 
-            const tableHead = document.querySelector('#eventResultsTable thead');
-            const tableBody = document.querySelector('#eventResultsTable tbody');
+            const eventResultsTableHead = document.querySelector('#eventResultsTable thead');
+            const eventResultsTableBody = document.querySelector('#eventResultsTable tbody');
+            const pointsTableBody = document.querySelector('#pointsTable tbody');
 
- 
             const headers = data[0].values[0]; 
-            const headerRow = document.createElement('tr');
+            const results = data.slice(1).flatMap(range => range.values.slice(1));
+
+            // Populate Event Results Table
+            const eventHeaderRow = document.createElement('tr');
             headers.forEach(header => {
                 const th = document.createElement('th');
                 th.textContent = header;
-                headerRow.appendChild(th);
+                eventHeaderRow.appendChild(th);
             });
-            tableHead.appendChild(headerRow);
+            eventResultsTableHead.appendChild(eventHeaderRow);
 
-            data.forEach((range, index) => {
-                if (index === 0) return; 
-                range.values.slice(1).forEach(row => {
-                    const rowElement = document.createElement('tr');
-                    row.forEach(cell => {
-                        const cellElement = document.createElement('td');
-                        cellElement.textContent = cell;
-                        rowElement.appendChild(cellElement);
-                    });
-                    tableBody.appendChild(rowElement);
+            results.forEach(row => {
+                const rowElement = document.createElement('tr');
+                row.forEach(cell => {
+                    const cellElement = document.createElement('td');
+                    cellElement.textContent = cell;
+                    rowElement.appendChild(cellElement);
                 });
+                eventResultsTableBody.appendChild(rowElement);
+            });
+
+            // Calculate Points and Populate Points Table
+            const points = calculatePoints(results);
+            const participants = Object.keys(points);
+
+            participants.forEach(participant => {
+                const { eventPoints, totalPoints } = points[participant];
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${participant}</td>
+                    ${eventPoints.map(point => `<td>${point}</td>`).join('')}
+                    <td>${totalPoints}</td>
+                `;
+                pointsTableBody.appendChild(tr);
             });
         }
 
         fetchData().then(data => {
-            populateTable(data);
+            populateTables(data);
         }).catch(error => {
             console.error('Error processing data:', error);
         });
     </script>
 </body>
-
 </html>
