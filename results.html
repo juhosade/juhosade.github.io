@@ -23,28 +23,27 @@
         <div class="content">
             <h2>Tulokset</h2>
 
-            <!-- Existing table for event results -->
             <div class="results-table">
                 <table id="eventResultsTable">
                     <thead>
                         <tr>
-                            <!-- Headers for each event will be dynamically added -->
+       
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Rows will be populated here -->
+            
                     </tbody>
                 </table>
             </div>
 
-            <!-- New table for points -->
+     
             <div class="points-table">
                 <h3>Pisteet</h3>
                 <table id="pointsTable">
                     <thead>
                         <tr>
                             <th>Osallistuja</th>
-                            <!-- Headers for 10 events and total points -->
+            
                             <th>Bilis</th>
                             <th>Draiverin heitto</th>
                             <th>Flipcup</th>
@@ -59,7 +58,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Rows will be populated here -->
                     </tbody>
                 </table>
             </div>
@@ -67,17 +65,17 @@
     </div>
 
     <footer>
-        <p>&copy; 2024 Dokathlon. Kaikki oikeudet pidätetään.</p>
+        <p>&copy; 2024 Dokathlon. Kaikki (oikeudet) pidätetään.</p>
     </footer>
 
     <script>
         const API_KEY = 'AIzaSyDD90a2fkngn3OCYwJpijcZtyWwohmWJ8Q'; 
         const SHEET_ID = '1VmCpTWbrkG5XXCjxoXsAb6mGIcIVIrlj4e-YrnmSwq4'; 
-        const rangesA1 = ['Taulukko1!A1:T1', 'Taulukko1!A2:T20']; // Updated range to include 10 events
+        const rangesA1 = ['Taulukko1!A1:T1', 'Taulukko1!A2:T20']; 
 
         async function fetchData() {
             try {
-                // Join ranges for API call
+
                 const rangeParams = rangesA1.map(range => `ranges=${encodeURIComponent(range)}`).join('&');
                 const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values:batchGet?${rangeParams}&key=${API_KEY}`;
                 const response = await fetch(url);
@@ -100,12 +98,9 @@
 
         function calculatePoints(results) {
             const points = {};
-            const eventCount = results[0].length - 1; // Number of events
+            const eventCount = results[0].length - 1; 
+            const eventTypes = [1, 0, 1, 0, 1, 0, 0, 0, 0, 1];
 
-            // Determine event types (1 means smallest value wins, 0 means largest value wins)
-            const eventTypes = [1, 0, 1, 0, 1, 0, 0, 0, 0, 1]; // Corresponds to each event in order
-
-            // Initialize points object for each participant
             results.forEach(row => {
                 const participant = row[0];
                 const scores = row.slice(1).map(score => score ? Number(score) : 0);
@@ -113,21 +108,19 @@
                 if (!points[participant]) {
                     points[participant] = {
                         totalPoints: 0,
-                        eventPoints: Array(eventCount).fill(0) // Points per event
+                        eventPoints: Array(eventCount).fill(0)
                     };
                 }
 
                 points[participant].scores = scores;
             });
 
-            // Calculate points for each event
             for (let eventIndex = 0; eventIndex < eventCount; eventIndex++) {
                 const eventScores = Object.entries(points).map(([participant, data], idx) => ({
                     participant,
                     score: data.scores[eventIndex]
                 }));
 
-                // Sort event scores: ascending if smallest wins, descending if largest wins
                 eventScores.sort((a, b) => eventTypes[eventIndex] ? a.score - b.score : b.score - a.score);
 
                 let currentPoints = 17;
@@ -143,7 +136,7 @@
                     }
 
                     if (score !== lastScore) {
-                        currentPoints -= tieCount; // Decrement current points by tie count
+                        currentPoints -= tieCount;
                         lastScore = score;
                         tieCount = 0;
                     }
@@ -152,8 +145,6 @@
                     points[participant].totalPoints += currentPoints;
                     tieCount++;
                 });
-
-                // Adjust the next starting points based on the number of ties
                 currentPoints -= tieCount - 1;
             }
 
@@ -173,7 +164,6 @@
             const headers = data[0].values[0]; 
             const results = data.slice(1).flatMap(range => range.values.slice(1));
 
-            // Populate Event Results Table
             const eventHeaderRow = document.createElement('tr');
             headers.forEach(header => {
                 const th = document.createElement('th');
@@ -192,7 +182,7 @@
                 eventResultsTableBody.appendChild(rowElement);
             });
 
-            // Calculate Points and Populate Points Table
+     
             const points = calculatePoints(results);
             const participants = Object.keys(points);
 
