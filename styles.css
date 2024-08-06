@@ -308,12 +308,12 @@ footer {
         float: none;
         width: 90%;
         text-align: center;
-        padding: 20px;
+        padding: 0px;
     }
 
     .container, .containerP4P {
         width: 90%;
-        padding: 20px 0;
+        padding: 0px 0;
     }
 
     .content, .P4Pcontent, .P4Pcontentheros {
