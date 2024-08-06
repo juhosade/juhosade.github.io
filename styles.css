@@ -35,8 +35,7 @@ nav a:hover {
 }
 
 .container {
-    width: 90%; /* Use more of the screen width */
-    max-width: 1200px; /* Set a max-width for large screens */
+    width: 90%;
     margin: auto;
     overflow: hidden;
     padding: 20px 0;
@@ -44,8 +43,7 @@ nav a:hover {
 
 .containerP4P {
     display: flex;
-    width: 90%; /* Use more of the screen width */
-    max-width: 1200px; /* Set a max-width for large screens */
+    width: 90%; 
     margin: auto;
     overflow: hidden;
     align-items: center;
