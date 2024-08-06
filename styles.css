@@ -35,7 +35,7 @@ nav a:hover {
 }
 
 .container {
-    width: 80%;
+    width: 100%; /* Allow full width for responsiveness */
     margin: auto;
     overflow: hidden;
     padding: 20px 0;
@@ -43,7 +43,7 @@ nav a:hover {
 
 .containerP4P {
     display: flex;
-    width: 80%;
+    width: 100%; /* Allow full width for responsiveness */
     margin: auto;
     overflow: hidden;
     align-items: center;
@@ -73,10 +73,11 @@ img.history1 {
 .content {
     background: white;
     font-size: 20px;
-    padding: 80px;
-    margin: 50px;
+    padding: 40px; /* Reduced padding for better mobile experience */
+    margin: 20px 0; /* Reduced margin for better mobile experience */
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Allow full width for responsiveness */
 }
 
 .P4Pcontent {
@@ -86,13 +87,13 @@ img.history1 {
     text-decoration: none;
     display: flex;
     align-items: center;
-    width: 40%;
     max-height: 30px;
     font-size: 20px;
     padding: 8px;
-    margin: 50px;
+    margin: 20px 0; /* Reduced margin for better mobile experience */
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Allow full width for responsiveness */
 }
 
 .P4Pcontentheros {
@@ -102,12 +103,12 @@ img.history1 {
     text-decoration: none;
     display: block;
     align-items: center;
-    width: 40%;
     font-size: 20px;
     padding: 20px;
-    margin: 50px;
+    margin: 20px 0; /* Reduced margin for better mobile experience */
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Allow full width for responsiveness */
 }
 
 a:link {
@@ -270,7 +271,7 @@ footer {
 
 .results-table, .points-table {
     margin: 20px 0;
-    overflow-x: auto; 
+    overflow-x: auto;
     width: 100%;
 }
 
@@ -285,6 +286,7 @@ footer {
     text-align: center;
     border: 1px solid #ddd;
     word-wrap: break-word; /* Allows words to break and prevent overflow */
+    white-space: nowrap; /* Prevents the text from wrapping and ensures horizontal scrolling */
 }
 
 .results-table th, .points-table th {
@@ -312,7 +314,7 @@ footer {
     }
 
     .container, .containerP4P {
-        width: 90%;
+        width: 100%;
         padding: 10px 0;
     }
 
@@ -359,6 +361,10 @@ footer {
     h3 {
         font-size: 1em;
     }
+
+    .center2 {
+        font-size: 2em; /* Smaller font size for .center2 */
+    }
 }
 
 @media (max-width: 480px) {
@@ -387,5 +393,9 @@ footer {
 
     h3 {
         font-size: 0.5em; /* Smaller font size for h3 */
+    }
+
+    .center2 {
+        font-size: 1.5em; /* Smaller font size for .center2 */
     }
 }
