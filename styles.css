@@ -310,7 +310,7 @@ footer {
 @media (max-width: 768px) {
     nav a {
         float: none;
-        width: 100%;
+        width: 90%;
         text-align: left;
         padding: 10px;
     }
@@ -334,7 +334,7 @@ footer {
 
     .fighter-image {
         margin: 0 0 20px 0;
-        max-width: 100%;
+        max-width: 90%;
     }
 
     .record {
@@ -348,7 +348,7 @@ footer {
     }
 
     .stat {
-        flex: 1 1 100%;
+        flex: 1 1 90%;
         margin: 10px 0;
     }
 
