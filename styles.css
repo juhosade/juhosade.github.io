@@ -307,7 +307,7 @@ footer {
 }
 
 /* Media Queries */
-@media (max-width: 1000px) {
+@media (max-width: 768px) {
     nav a {
         float: none;
         width: 100%;
