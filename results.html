@@ -22,50 +22,39 @@
     <div class="container">
         <div class="content">
             <h2>Tulokset</h2>
-
-            <!-- Introduction Paragraph -->
             <p>Täältä löydät tulokset eri kilpailutapahtumista. Kilpailijat saavat pisteitä suoritustensa perusteella, ja ne on laskettu taulukkoon alla. Kilpailusuoritus pisteytetään antamalla voittajalle 17 pistettä ja lajin viimeiselle yksi piste. Tasatilanteessa molemmat osallistujat saavat korkeamman pistemäärän.</p>
-
             <div class="results-table">
                 <h3>Tapahtumatulokset</h3>
-                <table id="eventResultsTable">
-                    <thead>
-                        <tr>
-                            <!-- Dynamic headers will be inserted here -->
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Rows with event results will be dynamically inserted here -->
-                    </tbody>
-                </table>
+                <div style="overflow-x: auto;">
+                    <table id="eventResultsTable">
+                        <thead>
+                            <tr>
+                                <!-- Column headers will be dynamically added here -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data rows will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
-
+            
             <div class="points-table">
                 <h3>Pisteet</h3>
-                <table id="pointsTable">
-                    <thead>
-                        <tr>
-                            <th>Osallistuja</th>
-                            <th>Biljardi</th>
-                            <th>Draiverin heitto</th>
-                            <th>Flipcup</th>
-                            <th>Mölkky</th>
-                            <th>Kaljapiilo</th>
-                            <th>Tikka</th>
-                            <th>Loopin louie</th>
-                            <th>Petankki</th>
-                            <th>Tarkkuuskaljometri</th>
-                            <th>Suplautailu</th>
-                            <th>Pisteet yht.</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Rows with participants' points will be dynamically inserted here -->
-                    </tbody>
-                </table>
+                <div style="overflow-x: auto;">
+                    <table id="pointsTable">
+                        <thead>
+                            <tr>
+                                <!-- Column headers will be dynamically added here -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data rows will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-    </div>
+            
 
     <footer>
         <p>&copy; 2024 Dokathlon. Kaikki (oikeudet) pidätetään.</p>
@@ -78,7 +67,6 @@
 
         async function fetchData() {
             try {
-
                 const rangeParams = rangesA1.map(range => `ranges=${encodeURIComponent(range)}`).join('&');
                 const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values:batchGet?${rangeParams}&key=${API_KEY}`;
                 const response = await fetch(url);
@@ -154,59 +142,60 @@
             return points;
         }
 
-function populateTables(data) {
-    if (!data || data.length === 0) {
-        console.error('No data available to populate the tables.');
-        return;
-    }
+        function populateTables(data) {
+            if (!data || data.length === 0) {
+                console.error('No data available to populate the tables.');
+                return;
+            }
 
-    const eventResultsTableHead = document.querySelector('#eventResultsTable thead');
-    const eventResultsTableBody = document.querySelector('#eventResultsTable tbody');
-    const pointsTableBody = document.querySelector('#pointsTable tbody');
+            const eventResultsTableHead = document.querySelector('#eventResultsTable thead tr');
+            const eventResultsTableBody = document.querySelector('#eventResultsTable tbody');
+            const pointsTableHead = document.querySelector('#pointsTable thead tr');
+            const pointsTableBody = document.querySelector('#pointsTable tbody');
 
-    const headers = data[0].values[0]; 
-    const results = data.slice(1).flatMap(range => range.values.slice(1));
+            const headers = data[0].values[0]; 
+            const results = data.slice(1).flatMap(range => range.values.slice(1));
 
-    // Populate Event Results Table
-    const eventHeaderRow = document.createElement('tr');
-    headers.forEach(header => {
-        const th = document.createElement('th');
-        th.textContent = header;
-        eventHeaderRow.appendChild(th);
-    });
-    eventResultsTableHead.appendChild(eventHeaderRow);
+            // Populate Event Results Table
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                eventResultsTableHead.appendChild(th);
+            });
 
-    results.forEach(row => {
-        const rowElement = document.createElement('tr');
-        row.forEach(cell => {
-            const cellElement = document.createElement('td');
-            cellElement.textContent = cell;
-            rowElement.appendChild(cellElement);
-        });
-        eventResultsTableBody.appendChild(rowElement);
-    });
+            results.forEach(row => {
+                const rowElement = document.createElement('tr');
+                row.forEach(cell => {
+                    const cellElement = document.createElement('td');
+                    cellElement.textContent = cell;
+                    rowElement.appendChild(cellElement);
+                });
+                eventResultsTableBody.appendChild(rowElement);
+            });
 
-    // Calculate Points and Sort Participants by Total Points
-    const points = calculatePoints(results);
-    const participants = Object.keys(points);
+            const points = calculatePoints(results);
+            const participants = Object.keys(points);
 
-    // Sorting participants by total points in descending order
-    participants.sort((a, b) => points[b].totalPoints - points[a].totalPoints);
+            // Populate Points Table Headers
+            pointsTableHead.innerHTML = `
+                <th>Osallistuja</th>
+                ${headers.slice(1).map(header => `<th>${header}</th>`).join('')}
+                <th>Pisteet yht.</th>
+            `;
 
-    // Populate Points Table
-    participants.forEach(participant => {
-        const { eventPoints, totalPoints } = points[participant];
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${participant}</td>
-            ${eventPoints.map(point => `<td>${point}</td>`).join('')}
-            <td>${totalPoints}</td>
-        `;
-        pointsTableBody.appendChild(tr);
-    });
-}
+            participants.sort((a, b) => points[b].totalPoints - points[a].totalPoints);
 
-
+            participants.forEach(participant => {
+                const { eventPoints, totalPoints } = points[participant];
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${participant}</td>
+                    ${eventPoints.map(point => `<td>${point}</td>`).join('')}
+                    <td>${totalPoints}</td>
+                `;
+                pointsTableBody.appendChild(tr);
+            });
+        }
 
         fetchData().then(data => {
             populateTables(data);
