@@ -267,42 +267,70 @@ footer {
     text-align: center;
 }
 
-.results-table, .leaderboard {
-    margin: 20px auto;
+.results-table {
+    margin: 20px 0;
     overflow-x: auto;
 }
 
-table {
+.results-table table {
     width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
+    table-layout: auto;
 }
 
-th, td {
+.results-table th, .results-table td {
     padding: 10px;
     text-align: center;
     border: 1px solid #ddd;
 }
 
-th {
+.results-table th {
     background-color: #194419;
     color: white;
     font-weight: bold;
 }
 
-tr:nth-child(even) {
+.results-table tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
-tr:hover {
+.results-table tr:hover {
     background-color: #ffd700;
     color: #194419;
 }
-
-tbody td {
-    font-size: 16px;
+.points-table {
+    margin: 20px 0;
+    overflow-x: auto;
 }
 
-thead th {
-    font-size: 18px;
+.points-table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.points-table table {
+    width: 100%;
+    table-layout: auto;
+    border-collapse: collapse;
+}
+
+.points-table th, .points-table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+    word-wrap: break-word;
+}
+
+.points-table th {
+    background-color: #194419;
+    color: white;
+    font-weight: bold;
+}
+
+.points-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.points-table tr:hover {
+    background-color: #ffd700;
+    color: #194419;
 }
