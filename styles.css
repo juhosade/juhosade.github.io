@@ -35,7 +35,8 @@ nav a:hover {
 }
 
 .container {
-    width: 100%; /* Allow full width for responsiveness */
+    width: 90%; /* Use more of the screen width */
+    max-width: 1200px; /* Set a max-width for large screens */
     margin: auto;
     overflow: hidden;
     padding: 20px 0;
@@ -43,7 +44,8 @@ nav a:hover {
 
 .containerP4P {
     display: flex;
-    width: 100%; /* Allow full width for responsiveness */
+    width: 90%; /* Use more of the screen width */
+    max-width: 1200px; /* Set a max-width for large screens */
     margin: auto;
     overflow: hidden;
     align-items: center;
@@ -305,7 +307,7 @@ footer {
 }
 
 /* Media Queries */
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
     nav a {
         float: none;
         width: 100%;
