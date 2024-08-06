@@ -170,7 +170,7 @@ img.P4Phero {
 .headerhis {
     font-size: 20px;
     justify-content: center;
-    display: flex;
+    display: block;
     align-items: center;
     padding-bottom: 50px;
 }
