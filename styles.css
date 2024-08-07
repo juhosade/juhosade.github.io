@@ -313,7 +313,7 @@ footer {
 @media (max-width: 768px) {
     nav a {
         float: none;
-        width: 90%;
+        width: 70%;
         text-align: center;
         padding: 10px;
     }
@@ -352,6 +352,7 @@ footer {
 
     .results-table table, .points-table table {
         font-size: 10px;
+        width: 60%;
         overflow-y: auto; 
         overflow-x: auto; 
     }
