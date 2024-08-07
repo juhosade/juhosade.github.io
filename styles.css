@@ -390,7 +390,8 @@ footer {
     }
 
     .results-table table, .points-table table {
-        font-size: 12px; /* Further reduced font size for readability */
+        font-size: 12px; 
+        width: 20%;
     }
 
     .P4Pcontent, .P4Pcontentheros {
