@@ -342,6 +342,10 @@ footer {
         flex-direction: column;
         align-items: center;
     }
+    
+    .results-table table, .points-table table {
+        font-size: 14px; /* Reduced font size for readability */
+    }
 
     .stat {
         flex: 1 1 90%;
@@ -373,6 +377,10 @@ footer {
     .content {
         padding: 20px;
         margin: 20px 10px;
+    }
+
+    .results-table table, .points-table table {
+        font-size: 12px; /* Further reduced font size for readability */
     }
 
     .P4Pcontent, .P4Pcontentheros {

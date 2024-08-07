@@ -176,7 +176,6 @@
             const points = calculatePoints(results);
             const participants = Object.keys(points);
 
-            // Populate Points Table Headers
             pointsTableHead.innerHTML = `
                 <th>Osallistuja</th>
                 ${headers.slice(1).map(header => `<th>${header}</th>`).join('')}
