@@ -4,6 +4,7 @@ body {
     color: #333;
     margin: 0;
     padding: 0;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 header {
@@ -48,6 +49,7 @@ nav a:hover {
     overflow: hidden;
     align-items: center;
     padding: 20px 0;
+    flex-wrap: wrap; /* Allow wrapping to prevent overflow */
 }
 
 img.heropic {
@@ -94,6 +96,7 @@ img.history1 {
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%; /* Allow full width for responsiveness */
+    overflow: hidden; /* Prevent content overflow */
 }
 
 .P4Pcontentheros {
@@ -109,6 +112,7 @@ img.history1 {
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%; /* Allow full width for responsiveness */
+    overflow: hidden; /* Prevent content overflow */
 }
 
 a:link {
@@ -271,13 +275,15 @@ footer {
 
 .results-table, .points-table {
     margin: 20px 0;
-    overflow-x: auto;
-    width: 100%;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    width: 65%;
+    display: flex;
+    flex-direction: column; /* Stack table content vertically */
 }
 
 .results-table table, .points-table table {
-    width: 100%;
-    table-layout: fixed; /* Ensures that columns are evenly spaced */
+    width: 65%;
+    table-layout: auto; /* Ensures that columns are evenly spaced */
     border-collapse: collapse;
 }
 
@@ -303,6 +309,7 @@ footer {
     background-color: #ffd700;
     color: #194419;
 }
+
 @media (max-width: 768px) {
     nav a {
         float: none;
@@ -344,7 +351,7 @@ footer {
     }
 
     .results-table table, .points-table table {
-        font-size: 14px;
+        font-size: 10px;
         overflow-y: auto; 
         overflow-x: auto; 
     }
@@ -355,7 +362,7 @@ footer {
     }
 
     h1 {
-        font-size: 1.5em;
+        font-size: 1em;
     }
 
     h2 {
