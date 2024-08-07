@@ -303,6 +303,8 @@ footer {
     background-color: #ffd700;
     color: #194419;
 }
+
+/* Responsive styles */
 @media (max-width: 768px) {
     nav a {
         float: none;
@@ -342,9 +344,11 @@ footer {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .results-table table, .points-table table {
-        font-size: 14px; /* Reduced font size for readability */
+        font-size: 14px;
+        overflow-y: auto; 
+        overflow-x: auto; 
     }
 
     .stat {
@@ -365,7 +369,7 @@ footer {
     }
 
     .center2 {
-        font-size: 2em; /* Smaller font size for .center2 */
+        font-size: 2em;
     }
 }
 
@@ -380,21 +384,21 @@ footer {
     }
 
     .results-table table, .points-table table {
-        font-size: 12px; /* Further reduced font size for readability */
+        font-size: 2px; /* Further reduced font size for readability */
     }
 
     .P4Pcontent, .P4Pcontentheros {
         margin: 20px 10px;
         padding: 10px;
-        font-size: 9px;
+        font-size: 12px; /* Adjusted for better readability */
     }
 
     h1 {
-        font-size: 2em; /* Smaller font size for h1 */
+        font-size: 1.5em; /* Smaller font size for h1 */
     }
 
     h2 {
-        font-size: 1.2em; /* Smaller font size for h2 */
+        font-size: 1em; /* Smaller font size for h2 */
     }
 
     h3 {
