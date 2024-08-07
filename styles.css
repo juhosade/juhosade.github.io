@@ -352,7 +352,7 @@ footer {
 
     .results-table table, .points-table table {
         font-size: 10px;
-        width: 60%;
+        width: 20%;
         overflow-y: auto; 
         overflow-x: auto; 
     }
