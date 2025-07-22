@@ -94,7 +94,10 @@
 
             results.forEach(row => {
                 const participant = row[0];
-                const scores = row.slice(1).map(score => score ? Number(score) : 0);
+                const scores = row.slice(1).map(score => {
+                    const num = parseFloat(score);
+                    return isNaN(num) ? null : num;
+                });
 
                 if (!points[participant]) {
                     points[participant] = {
@@ -107,40 +110,37 @@
             });
 
             for (let eventIndex = 0; eventIndex < eventCount; eventIndex++) {
-                const eventScores = Object.entries(points).map(([participant, data], idx) => ({
-                    participant,
-                    score: data.scores[eventIndex]
-                }));
+                const eventScores = Object.entries(points)
+                    .map(([participant, data]) => ({
+                        participant,
+                        score: data.scores[eventIndex]
+                    }))
+                    .filter(entry => entry.score !== null); 
+                if (eventScores.length === 0) continue; 
 
-                eventScores.sort((a, b) => eventTypes[eventIndex] ? a.score - b.score : b.score - a.score);
+                eventScores.sort((a, b) =>
+                    eventTypes[eventIndex] ? a.score - b.score : b.score - a.score
+                );
 
                 let currentPoints = 19;
                 let lastScore = null;
                 let tieCount = 0;
 
-                eventScores.forEach((entry, idx) => {
-                    const { participant, score } = entry;
-
-                    if (score === 0) {
-                        points[participant].eventPoints[eventIndex] = 0;
-                        return;
-                    }
+                for (let i = 0; i < eventScores.length; i++) {
+                    const { participant, score } = eventScores[i];
 
                     if (score !== lastScore) {
                         currentPoints -= tieCount;
-                        lastScore = score;
                         tieCount = 0;
+                        lastScore = score;
                     }
 
                     points[participant].eventPoints[eventIndex] = currentPoints;
                     points[participant].totalPoints += currentPoints;
                     tieCount++;
-                });
-                currentPoints -= tieCount - 1;
+                }
             }
 
-            return points;
-        }
 
         function populateTables(data) {
             if (!data || data.length === 0) {
