@@ -114,8 +114,7 @@
 
                 eventScores.sort((a, b) => eventTypes[eventIndex] ? a.score - b.score : b.score - a.score);
 
-                const nonZeroParticipants = eventScores.filter(e => e.score > 0).length;
-                let currentPoints = nonZeroParticipants;
+                let currentPoints = 19;
                 let lastScore = null;
                 let tieCount = 0;
 
