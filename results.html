@@ -90,7 +90,7 @@
         function calculatePoints(results) {
             const points = {};
             const eventCount = results[0].length - 1; 
-            const eventTypes = [1, 0, 0, 1, 1, 0, 0, 0, 0, 1];
+            const eventTypes = [1, 0, 1, 0, 1, 0, 0, 0, 1, 1];
 
             results.forEach(row => {
                 const participant = row[0];
@@ -114,7 +114,7 @@
 
                 eventScores.sort((a, b) => eventTypes[eventIndex] ? a.score - b.score : b.score - a.score);
 
-                let currentPoints = 19;
+                let currentPoints = 17;
                 let lastScore = null;
                 let tieCount = 0;
 
