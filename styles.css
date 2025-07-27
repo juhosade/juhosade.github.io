@@ -36,10 +36,12 @@ nav a:hover {
 }
 
 .container {
-    width: 80%;
+    width: 100%;
+    max-width: 1500px;
     margin: auto;
     overflow: hidden;
     padding: 20px 0;
+    box-sizing: border-box;
 }
 
 .containerP4P {
@@ -310,7 +312,7 @@ footer {
     }
 
     .container, .containerP4P {
-        width: 80%;
+        max-width: 100%;
         padding: 0px 0;
     }
 
