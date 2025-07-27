@@ -116,14 +116,11 @@ img.historyheader {
 
 img.P4Phero {
     max-height: 200px;
-    height: auto;
-    width: auto;
-    max-width: 100%;
-    object-fit: contain;
+    width: auto; /* Maintain aspect ratio */
+    max-width: 100%; /* Constrain width to container */
     display: flex;
-    margin: 0 auto;
+    align-items: center;
 }
-
 
 .ontop {
     position: relative;
@@ -205,11 +202,6 @@ footer {
 .fighter-image {
     max-width: 30%;
     height: fit-content; /* Maintain aspect ratio */
-    width: 100%;
-    max-width: 250px;
-    height: auto;
-    object-fit: contain;
-    aspect-ratio: 3 / 4; 
     margin-right: 20px;
 }
 
@@ -331,7 +323,6 @@ footer {
     .fighter-image {
         max-width: 100%;
         max-height: 250px; /* Maintain aspect ratio */
-        height: auto;
         margin: 0 0 20px 0;
     }
 
