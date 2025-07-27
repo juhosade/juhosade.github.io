@@ -36,7 +36,7 @@ nav a:hover {
 }
 
 .container {
-    width: 90%;
+    width: 80%;
     margin: auto;
     overflow: hidden;
     padding: 20px 0;
@@ -68,10 +68,10 @@ img.header-image {
 }
 
 img.history1 {
-    max-width: 100%;
+    width: 100%;
     height: auto;
-    margin-right: 20px;
     display: block;
+    object-fit: cover;
 }
 
 .content {
@@ -310,7 +310,7 @@ footer {
     }
 
     .container, .containerP4P {
-        width: 90%;
+        width: 80%;
         padding: 0px 0;
     }
 
