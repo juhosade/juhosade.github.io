@@ -120,7 +120,7 @@ img.P4Phero {
     width: auto;
     max-width: 100%;
     object-fit: contain;
-    display: block;
+    display: flex;
     margin: 0 auto;
 }
 
