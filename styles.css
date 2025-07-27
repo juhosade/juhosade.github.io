@@ -4,7 +4,7 @@ body {
     color: #333;
     margin: 0;
     padding: 0;
-    overflow-x: hidden; /* Prevent horizontal scrolling */
+    overflow-x: hidden;
 }
 
 header {
@@ -49,19 +49,20 @@ nav a:hover {
     overflow: hidden;
     align-items: center;
     padding: 20px 0;
-    flex-wrap: wrap; /* Allow wrapping to prevent overflow */
+    flex-wrap: wrap;
 }
 
 img.heropic {
-    width: auto;
     max-width: 150px;
+    width: auto;
     height: auto;
+    display: block;
 }
 
 img.header-image {
     width: 100%;
-    height: auto;
     max-width: 1800px;
+    height: auto;
     display: block;
     margin: 0 auto;
 }
@@ -70,17 +71,18 @@ img.history1 {
     max-width: 100%;
     height: auto;
     margin-right: 20px;
+    display: block;
 }
 
 .content {
     background: white;
-    font-size: 1.25em; /* Use relative units for better scalability */
+    font-size: 1.25em;
     padding: 20px;
     margin: 20px 0;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Allow full width for responsiveness */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .P4Pcontent, .P4Pcontentheros {
@@ -95,9 +97,9 @@ img.history1 {
     margin: 20px 0;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Allow full width for responsiveness */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
-    max-width: 100%; /* Ensure it does not exceed the container width */
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100%;
 }
 
 a:link {
@@ -107,16 +109,21 @@ a:link {
 .hero {
     display: flex;
     align-items: center;
-    flex-wrap: wrap; /* Ensure content wraps */
+    flex-wrap: wrap;
 }
 
 img.historyheader {
     width: 100%;
+    height: auto;
+    display: block;
 }
 
 img.P4Phero {
-    aspect-ratio: 3 / 2; 
-    object-fit: contain; 
+    max-width: 100%;
+    height: auto !important;
+    aspect-ratio: auto !important;
+    object-fit: contain !important;
+    display: block;
 }
 
 .ontop {
@@ -126,7 +133,7 @@ img.P4Phero {
 }
 
 .center {
-    font-size: 5vw; /* Use viewport width units */
+    font-size: 5vw;
     font-weight: bold;
     color: #194419;
     position: absolute;
@@ -137,7 +144,7 @@ img.P4Phero {
 
 .center1 {
     max-height: 100px;
-    font-size: 5vw; /* Use viewport width units */
+    font-size: 5vw;
     font-weight: bold;
     color: #ffffff;
     position: absolute;
@@ -147,7 +154,7 @@ img.P4Phero {
 }
 
 .center2 {
-    font-size: 10vw; /* Use viewport width units */
+    font-size: 10vw;
     font-weight: bold;
     color: #ffffff;
     position: absolute;
@@ -157,7 +164,7 @@ img.P4Phero {
 }
 
 .headerhis {
-    font-size: 1.25em; /* Use relative units for better scalability */
+    font-size: 1.25em;
     text-align: center;
     padding-bottom: 50px;
 }
@@ -193,13 +200,14 @@ footer {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap; /* Ensure content wraps */
+    flex-wrap: wrap;
 }
 
 .fighter-image {
     max-width: 30%;
-    height: fit-content; /* Maintain aspect ratio */
+    height: auto;
     margin-right: 20px;
+    display: block;
 }
 
 .fighter-info {
@@ -211,7 +219,7 @@ footer {
     display: flex;
     justify-content: space-around;
     margin-top: 20px;
-    flex-wrap: wrap; /* Ensure content wraps */
+    flex-wrap: wrap;
 }
 
 .record div {
@@ -237,6 +245,7 @@ footer {
 .video {
     max-width: 100%;
     margin: 10px;
+    display: block;
 }
 
 .stats {
@@ -261,14 +270,14 @@ footer {
 
 .results-table, .points-table {
     margin: 20px 0;
-    width: 100%; /* Ensure full width */
+    width: 100%;
 }
 
 .results-table table, .points-table table {
     width: 100%;
     table-layout: auto;
     border-collapse: collapse;
-    word-wrap: break-word; /* Allow text to wrap */
+    word-wrap: break-word;
 }
 
 .results-table th, .results-table td, .points-table th, .points-table td {
@@ -319,8 +328,10 @@ footer {
 
     .fighter-image {
         max-width: 100%;
-        max-height: 250px; /* Maintain aspect ratio */
+        max-height: 250px;
+        height: auto;
         margin: 0 0 20px 0;
+        display: block;
     }
 
     .record {
@@ -376,7 +387,9 @@ footer {
 
     .fighter-image {
         max-width: 100%;
-        max-height: 250x; /* Ensure aspect ratio is maintained */
+        max-height: 250px;
+        height: auto;
         margin: 0 0 20px 0;
+        display: block;
     }
 }
