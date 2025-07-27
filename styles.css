@@ -118,7 +118,7 @@ img.P4Phero {
     max-height: 200px;
     width: auto; /* Maintain aspect ratio */
     max-width: 100%; /* Constrain width to container */
-    display: flex;
+    display: block;
     align-items: center;
 }
 
