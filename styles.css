@@ -115,11 +115,8 @@ img.historyheader {
 }
 
 img.P4Phero {
-    max-height: 200px;
-    width: auto; /* Maintain aspect ratio */
-    max-width: 100%; /* Constrain width to container */
-    display: block;
-    align-items: center;
+    aspect-ratio: 3 / 2; 
+    object-fit: contain; 
 }
 
 .ontop {
