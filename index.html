@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kotisivu</title>
+    <title>Kotisivu - Dokathlon OS</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/png" href="Kuvat/palkinto.png">
 </head>
 <body>
     <header class="hero">
         <img src="Kuvat/palkinto.png" alt="logo" class="heropic">
-        <h1>Dokathlon 2025</h1>
+        <h1>Dokathlon 2026</h1>
     </header>
+
+    <!-- Vertical Desktop Shortcut Column (Left Side) -->
     <nav>
         <a href="index.html">Kotisivu</a>
         <a href="about.html">Infosivu</a>
@@ -20,20 +22,832 @@
         <a href="results.html">Tulokset</a>
     </nav>
 
-    <div class = "ontop">
-        <img src="Kuvat/Header.png" alt="Header kuva" class="header-image"> 
-        <div class="center1">Dokathlon 2025!</div>
-    </div>
-    <div class="container">
-
-        <div class="content">
-            <p>Dokahtlon on historiallinen urheilujuhla, joka testaa osallistujien henkistä, fyysistä ja psyykkistä kestävyyttä 10 lajin muodossa. Lajit vaihtelevat vuosittain ja ovat tarkkaan varjeltu salaisuus, jotka kansainvälinen Dokathlonkomitea (IDSC) valitsee tarkasti. Onnittelut siis teille! Olette pääseet osaksi urheiluhistoriaa ja saaneet mahdollisuuden taistella maailman kunniotetuimmasta palkinnosta.</p>
-            <p>Tältä sivustolta löydätte tietoa Dokathlonista ja sen aikataulusta. Lisäksi voitte syventylä dokahtlonin pitkään ja juhlantäytteiseen historiaan, sekä tarkastella tuloksia reaaliajassa.</p>
-    
+    <!-- One Single Non-Scrolling Windows 95 Starting Screen (Aligned Containers) -->
+    <main class="starting-screen-view">
+        <div class="starting-screen-header">
+            <img src="Kuvat/palkinto.png" alt="logo" class="starting-logo">
+            <div class="starting-header-text">
+                <h1>🏁 DOKATHLON 2026 OS 🏁</h1>
+                <p>Tervetuloa Dokathlon OS v20.26 -työpöytäympäristöön! Olet päässyt osaksi urheiluhistoriaa taistelemaan maailman kunnioitetuimmasta 10 lajin palkinnosta. Suorita valmistelevat harjoitukset alla olevassa minipelissä tai avaa sovellus vasemmasta pikakuvakepalkista.</p>
+            </div>
         </div>
-    </div>
-    <footer>
-        <p>&copy; 2025 Dokathlon. Kaikki (oikeudet) pidätetään.</p>
-    </footer>
+
+        <div class="starting-game-area">
+            <canvas id="gameCanvas" width="720" height="528" tabindex="0"></canvas>
+            <div class="touch-pad">
+                <div class="dpad">
+                    <button class="u" data-dir="up">&#9650;</button>
+                    <button class="l" data-dir="left">&#9664;</button>
+                    <button class="d" data-dir="down">&#9660;</button>
+                    <button class="r" data-dir="right">&#9654;</button>
+                </div>
+                <button class="btn-a" data-act="a">A</button>
+            </div>
+        </div>
+    </main>
+
+<script>
+(function () {
+"use strict";
+
+const TILE = 48, VIEW_W = 15, VIEW_H = 11;
+const SW = VIEW_W * TILE, SH = VIEW_H * TILE;
+const DRIVE_SPEED = 6.0; 
+
+const PAL = {
+    grass:"#80b858", grassDark:"#68a048", tree:"#306840", treeDark:"#204830",
+    trunk:"#604028", road:"#a8a090", roadDark:"#888070", roadLine:"#d8d0b0",
+    highway:"#50545c", highwayLine:"#e8e8e8", centerLine: "#ffcc00",
+    sand:"#e8d898", sandDark:"#d0c080",
+    bridge:"#806040", bridgeDark:"#503820",
+    water:"#4878c8", waterLight:"#78a8e8", waterDeep:"#3868b8", 
+    storeWall:"#d86058", storeRoof:"#983838",
+    storeSign:"#f8f0c8", cotWall:"#b08050", cotRoof:"#704830", door:"#403028",
+    homeWall:"#90a0c0", homeRoof:"#506080", pier:"#8b5a2b", pierDark:"#5a3a1b",
+    flower:"#e878a0", carBody:"#e04038", carDark:"#982020", carGlass:"#90c8e8",
+    wheel:"#282830", uiBg:"#f8f8f0", uiBorder:"#405078", uiText:"#283040",
+    shadow:"#182820", win:"#187830", light:"#fff0b4", hpGood:"#4CAF50", hpBad:"#F44336"
+};
+
+// --- Procedural 100x100 Map Generation ---
+function hash(x, y) {
+    let h = ((x * 73856093) ^ (y * 19349663)) >>> 0;
+    h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0;
+    return (h ^ (h >>> 16)) >>> 0;
+}
+function srand(seed) {
+    let s = seed >>> 0;
+    return function () {
+        s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+        return s / 4294967296;
+    };
+}
+
+const MAP_W = 100, MAP_H = 100;
+const mapGrid = Array.from({length: MAP_H}, () => Array(MAP_W).fill('G'));
+
+function rect(x, y, w, h, ch) {
+    for(let iy=y; iy<y+h; iy++) {
+        for(let ix=x; ix<x+w; ix++) {
+            if(ix>=0 && ix<MAP_W && iy>=0 && iy<MAP_H) mapGrid[iy][ix] = ch;
+        }
+    }
+}
+
+// 1. Generate dense forest base
+const rnd = srand(12345);
+for(let i=0; i<4500; i++) mapGrid[Math.floor(rnd()*MAP_H)][Math.floor(rnd()*MAP_W)] = 'T';
+for(let i=0; i<2000; i++) {
+    let x = Math.floor(rnd()*MAP_W), y = Math.floor(rnd()*MAP_H);
+    if(mapGrid[y][x] === 'G') mapGrid[y][x] = 'F';
+}
+rect(0, 0, MAP_W, MAP_H, 'T'); 
+rect(1, 1, MAP_W-2, MAP_H-2, 'G');
+for(let i=0; i<3500; i++) mapGrid[Math.floor(rnd()*MAP_H)][Math.floor(rnd()*MAP_W)] = 'T'; 
+
+// 2. Water Bodies
+rect(50, 0, 4, 100, 'W');  // Central River
+rect(15, 60, 10, 10, 'W'); // Scenic Lake
+rect(90, 20, 10, 80, 'W'); // Huge Lake (Moved East)
+rect(92, 25, 8, 70, '~');  // Deep Lake Center
+
+// 3. Procedural Coastlines (Sand around water)
+for (let y = 1; y < MAP_H - 1; y++) {
+    for (let x = 1; x < MAP_W - 1; x++) {
+        if (mapGrid[y][x] === 'G' || mapGrid[y][x] === 'T' || mapGrid[y][x] === 'F') {
+            let nearWater = false;
+            for (let dy = -2; dy <= 2; dy++) {
+                for (let dx = -2; dx <= 2; dx++) {
+                    if (mapGrid[y+dy] && (mapGrid[y+dy][x+dx] === 'W' || mapGrid[y+dy][x+dx] === '~')) {
+                        nearWater = true;
+                    }
+                }
+            }
+            if (nearWater) mapGrid[y][x] = 'Y'; 
+        }
+    }
+}
+
+// 4. Roads & Highways (Fixed 1-tile wide highway, direct cottage route)
+rect(11, 88, 20, 2, 'R'); // Main Road East from Home (2 tiles wide for clean driving)
+rect(30, 49, 2, 41, 'R'); // Main Road North to Highway intersection
+rect(30, 48, 52, 2, 'X'); // HIGHWAY (East-West)
+rect(50, 48, 4, 2, '+');  // Bridge over river
+rect(30, 18, 2, 30, 'R'); // Road North from Highway to Kioski/Alepa
+rect(80, 48, 3, 2, 'R');  // East road end
+rect(81, 48, 2, 6, 'R');  // Driveway south to Cottage
+rect(82, 53, 3, 2, 'R');  // Driveway connecting to Cottage Door at x=85
+
+// 5. Home Exterior & Driveway
+rect(10, 84, 3, 3, 'H');
+mapGrid[87][11] = 'Q';    // Home door
+rect(11, 88, 2, 2, 'R');  // Driveway
+
+// 6. Grocery Store / Kioski Area
+rect(27, 12, 6, 5, 'S');
+mapGrid[17][29] = 'E';    // Store door
+rect(27, 18, 6, 2, 'R');  // Parking lot
+
+// 7. Cottage Area
+rect(84, 49, 5, 4, 'C');
+mapGrid[53][85] = 'D';    // Cottage door
+rect(83, 54, 5, 3, 'Y');  // Beach dirt
+
+// 8. Piers and Docks
+rect(87, 54, 1, 4, 'P');  // Cottage pier
+rect(20, 60, 1, 3, 'P');  // Lake pier
+
+// 9. Flowers and Detail
+for(let i=0; i<800; i++) {
+    let x = Math.floor(rnd()*MAP_W), y = Math.floor(rnd()*MAP_H);
+    if(mapGrid[y][x] === 'G') mapGrid[y][x] = 'O';
+}
+
+// Ensure home car spawn clear
+mapGrid[88][11] = 'R'; 
+mapGrid[89][11] = 'R';
+
+// 10. BMW Blocking the Main Intersection (X:30-31, Y:49)!
+mapGrid[49][30] = 'V';
+mapGrid[49][31] = 'V';
+
+// --- Interior Maps ---
+const storeGrid = [
+    "WWWWWWWWWWWWWWWW",
+    "W..............W",
+    "W..SSSS..SSSS..W",
+    "W..SSSS..SSSS..W",
+    "W..............W",
+    "W..SSSS..SSSS..W",
+    "W..SSSS..SSSS..W",
+    "W..............W",
+    "W..CC......CC..W",
+    "W..............W",
+    "WWWWWWWWEDWWWWWW"
+];
+const cottageGrid = [
+    "WWWWWWWWWW",
+    "W.B....T.W",
+    "W........W",
+    "W..F..C..W",
+    "W........W",
+    "W........W",
+    "WWWWDDWWWW"
+];
+const homeGrid = [
+    "WWWWWWWWWW",
+    "W.B....T.W",
+    "W........W",
+    "W..F..C..W",
+    "W........W",
+    "W........W",
+    "WWWWDDWWWW"
+];
+
+// --- Game State & Audio ---
+let audioCtx = null, sfxGain = null;
+function initAudio() {
+    if (audioCtx) return;
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+        sfxGain = audioCtx.createGain();
+        sfxGain.gain.value = 0.15;
+        sfxGain.connect(audioCtx.destination);
+    } catch (e) {}
+}
+
+function playSfx(type) {
+    if (!audioCtx) return;
+    try {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.connect(g);
+        g.connect(sfxGain);
+        const now = audioCtx.currentTime;
+        if (type === 'step') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(120, now);
+            osc.frequency.exponentialRampToValueAtTime(40, now + 0.08);
+            g.gain.setValueAtTime(0.3, now);
+            g.gain.linearRampToValueAtTime(0.01, now + 0.08);
+            osc.start(now); osc.stop(now + 0.08);
+        } else if (type === 'door') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(300, now);
+            osc.frequency.linearRampToValueAtTime(150, now + 0.2);
+            g.gain.setValueAtTime(0.5, now);
+            g.gain.linearRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now); osc.stop(now + 0.2);
+        } else if (type === 'buy') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.setValueAtTime(880, now + 0.08);
+            g.gain.setValueAtTime(0.4, now);
+            g.gain.linearRampToValueAtTime(0.01, now + 0.25);
+            osc.start(now); osc.stop(now + 0.25);
+        } else if (type === 'win') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.setValueAtTime(659.25, now + 0.1);
+            osc.frequency.setValueAtTime(783.99, now + 0.2);
+            osc.frequency.setValueAtTime(1046.50, now + 0.3);
+            g.gain.setValueAtTime(0.5, now);
+            g.gain.linearRampToValueAtTime(0.01, now + 0.6);
+            osc.start(now); osc.stop(now + 0.6);
+        } else if (type === 'engine') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(65, now);
+            osc.frequency.linearRampToValueAtTime(55, now + 0.08);
+            g.gain.setValueAtTime(0.15, now);
+            g.gain.linearRampToValueAtTime(0.01, now + 0.08);
+            osc.start(now); osc.stop(now + 0.08);
+        } else if (type === 'honk') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(380, now);
+            osc.frequency.setValueAtTime(420, now + 0.1);
+            g.gain.setValueAtTime(0.6, now);
+            g.gain.linearRampToValueAtTime(0.01, now + 0.35);
+            osc.start(now); osc.stop(now + 0.35);
+        } else if (type === 'fight') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(180, now);
+            osc.frequency.linearRampToValueAtTime(40, now + 0.15);
+            g.gain.setValueAtTime(0.6, now);
+            g.gain.linearRampToValueAtTime(0.01, now + 0.15);
+            osc.start(now); osc.stop(now + 0.15);
+        }
+    } catch (e) {}
+}
+
+const state = {
+    mode: "overworld",
+    x: 11.5, y: 88.5,
+    dir: 0,
+    driving: true,
+    carX: 11.5, carY: 88.5, carDir: 0,
+    forgotCardsTriggered: false,
+    hasCards: false, // Pelikortit!
+    bmwDefeated: false,
+    hasBeer: false,  // Karhu Kori!
+    gameOver: false,
+    hp: 100, maxHp: 100,
+    msg: "Aja Kioskille / Alepaan hakemaan Karhu Kori!",
+    msgTimer: 360,
+    stepTimer: 0,
+    interactCooldown: 0,
+    // Original BMW Battle State
+    battle: {
+        active: false,
+        phase: "menu", // "menu" or "result"
+        timer: 0,
+        menu: 0,
+        msg: "⚠ TIELIIKENNEVÄITTELY! Musta BMW X5 roikkuu puskurissa ja väläyttelee pitkiä!",
+        resultTimer: 0
+    }
+};
+
+// --- Helper Math & Render Functions ---
+function getTile(m, x, y) {
+    let ix = Math.floor(x), iy = Math.floor(y);
+    if (m === "overworld") {
+        if (ix < 0 || ix >= MAP_W || iy < 0 || iy >= MAP_H) return 'W';
+        return mapGrid[iy][ix];
+    } else if (m === "store") {
+        if (iy < 0 || iy >= storeGrid.length || ix < 0 || ix >= storeGrid[0].length) return 'W';
+        return storeGrid[iy][ix];
+    } else if (m === "cottage") {
+        if (iy < 0 || iy >= cottageGrid.length || ix < 0 || ix >= cottageGrid[0].length) return 'W';
+        return cottageGrid[iy][ix];
+    } else if (m === "home") {
+        if (iy < 0 || iy >= homeGrid.length || ix < 0 || ix >= homeGrid[0].length) return 'W';
+        return homeGrid[iy][ix];
+    }
+    return 'W';
+}
+
+function isSolid(m, x, y, driving) {
+    let t = getTile(m, x, y);
+    if (m === "overworld") {
+        if (driving) {
+            // Roadblock check: Cannot drive past X:21 without getting cards!
+            if (!state.hasCards && x > 21.0) {
+                return true;
+            }
+            // ONLY Road (R), Highway (X), Bridge (+), Pier (P) allow driving!
+            return !(t === 'R' || t === 'X' || t === '+' || t === 'P');
+        }
+        // Walking solid barrier check
+        return (t === 'W' || t === '~' || t === 'T' || t === 'S' || t === 'C' || t === 'H' || t === 'V');
+    } else {
+        return (t === 'W' || t === 'S' || t === 'C' || t === 'B' || t === 'T' || t === 'F');
+    }
+}
+
+function showMsg(m, time=240) {
+    state.msg = m;
+    state.msgTimer = time;
+}
+
+function startBmwBattle() {
+    state.battle.active = true;
+    state.battle.phase = "menu";
+    state.battle.menu = 0;
+    state.battle.msg = "⚠ TIELIIKENNEVÄITTELY! Musta BMW X5 roikkuu puskurissa ja väläyttelee pitkiä!";
+    playSfx('honk');
+}
+
+function selectBattleOption(opt) {
+    if (state.battle.phase !== "menu") return;
+    state.battle.phase = "result";
+    state.battle.resultTimer = 180; // 3 seconds at 60fps
+    if (opt === 0) {
+        state.battle.msg = "Polkaiset jarrua! BMW väistää ojaan, mutta pelivaraa palaa (HP -15).";
+        state.hp = Math.max(0, state.hp - 15);
+        playSfx('fight');
+    } else if (opt === 1) {
+        state.battle.msg = "Näytät kansainvälisen käsimerkin. Kuski polttaa päreensä ja ohittaa! (HP -5)";
+        state.hp = Math.max(0, state.hp - 5);
+        playSfx('honk');
+    } else {
+        state.battle.msg = "Pidät katseen tiessä ja ignoraat täysin. BMW kyllästyy ja painaa ohi. (Täydellinen suoritus!)";
+        playSfx('win');
+    }
+}
+
+function resolveBattle() {
+    state.battle.active = false;
+    state.bmwDefeated = true;
+    mapGrid[49][30] = 'R'; // Clear BMW from intersection!
+    mapGrid[49][31] = 'R';
+    showMsg("💥 BMW ohitettu! Nyt aja pohjoiseen Kioskille (X:29, Y:17) hakemaan juomat ennen mökkiä!", 360);
+    playSfx('win');
+}
+
+function interact() {
+    initAudio();
+    if (state.gameOver) return;
+    if (state.interactCooldown > 0) return;
+    state.interactCooldown = 15;
+
+    // If inside BMW Battle Mode
+    if (state.battle.active) {
+        if (state.battle.phase === "menu") {
+            selectBattleOption(state.battle.menu);
+        } else if (state.battle.phase === "result") {
+            resolveBattle();
+        }
+        return;
+    }
+
+    let frontX = state.x, frontY = state.y;
+    if (state.dir === 0) frontY += 0.7;
+    else if (state.dir === 1) frontY -= 0.7;
+    else if (state.dir === 2) frontX -= 0.7;
+    else if (state.dir === 3) frontX += 0.7;
+
+    if (state.mode === "overworld") {
+        // 1. Check if near BMW at intersection (X:30, Y:49)
+        let distToBmw = Math.hypot(state.x - 30.5, state.y - 49.5);
+        if (!state.bmwDefeated && distToBmw < 3.2) {
+            startBmwBattle();
+            return;
+        }
+
+
+
+        let ft = getTile("overworld", frontX, frontY);
+        let ct = getTile("overworld", state.x, state.y);
+        
+        // 3. Store Entry
+        if (ft === 'E' || ct === 'E') {
+            state.mode = "store"; state.x = 8.5; state.y = 9.5; state.dir = 1;
+            state.driving = false;
+            showMsg("Astuit sisään Kioskille / Alepaan. Tuoreen pullan tuoksu.");
+            playSfx('door'); return;
+        }
+
+        // 4. Cottage Entry (Gated by Store drinks & Pelikortit)
+        if (ft === 'D' || ct === 'D') {
+            if (!state.hasBeer || !state.hasCards) {
+                let missing = [];
+                if (!state.hasCards) missing.push("Pelikortit");
+                if (!state.hasBeer) missing.push("Karhu Kori (24x)");
+                showMsg("🚫 Mökki on lukittu! Ennen saunomista pitää olla: " + missing.join(" & ") + "!");
+                playSfx('honk'); return;
+            }
+            // ALL MISSIONS COMPLETED - GAME ENDS IN VICTORY!
+            state.gameOver = true;
+            state.mode = "victory";
+            showMsg("🏆 PERILLÄ! Astuit mökille juomien ja pelikorttien kanssa! DOKATHLON 2026 ALKAA!", 9999);
+            playSfx('win'); return;
+        }
+
+        // 5. Home Door Interaction
+        if (ft === 'Q' || ct === 'Q') {
+            if (state.forgotCardsTriggered && !state.hasCards) {
+                state.hasCards = true;
+                showMsg("🃏 Rasse löysi pelikortit pöydältä! Nyt takaisin autoon ja kohti risteystä!", 360);
+                playSfx('win');
+                return;
+            }
+            showMsg("Olet jo hakenut pelikortit!");
+            playSfx('door'); return;
+        }
+
+        showMsg("Ei mitään tutkittavaa. Auto sijainnissa X:" + Math.round(state.carX) + " Y:" + Math.round(state.carY));
+    } else if (state.mode === "store") {
+        let ft = getTile("store", frontX, frontY);
+        let ct = getTile("store", state.x, state.y);
+        if (ft === 'S' || ft === 'C' || ft === '=' || ft === '$' || ft === 'B') {
+            if (!state.hasBeer) {
+                state.hasBeer = true;
+                showMsg("🍺 Ostit Karhu Korin (24x)! Nyt aja moottoritietä itään mökille (X:85, Y:53)!", 360);
+                playSfx('buy');
+            } else {
+                showMsg("Sinulla on jo tarpeeksi juomia kyydissä!");
+            }
+            return;
+        }
+        if (ft === 'D' || ct === 'D' || state.y > 9.8) {
+            state.mode = "overworld"; state.x = 29.5; state.y = 18.5; state.dir = 2;
+            state.driving = true;
+            showMsg("Poistuit kioskista. Astu autoon ja aja moottoritietä itään!");
+            playSfx('door'); return;
+        }
+    } else if (state.mode === "cottage") {
+        let ft = getTile("cottage", frontX, frontY);
+        let ct = getTile("cottage", state.x, state.y);
+        if (ft === 'T' || ft === 'F') {
+            showMsg("Ahhh... Saunan löylyt ovat täydelliset! VIITTO!");
+            playSfx('win'); return;
+        }
+        if (ft === 'D' || ct === 'D' || state.y > 5.8) {
+            state.mode = "overworld"; state.x = 85.5; state.y = 54.5; state.dir = 2;
+            showMsg("Poistuit Mökiltä.");
+            playSfx('door'); return;
+        }
+    } else if (state.mode === "home") {
+        let ct = getTile("home", state.x, state.y);
+        if (ct === 'D' || state.y > 5.8) {
+            state.mode = "overworld"; state.x = 11.5; state.y = 88.5; state.dir = 2;
+            showMsg("Poistuit kotoa.");
+            playSfx('door'); return;
+        }
+    }
+}
+
+// --- Input Handling ---
+const keys = {};
+window.addEventListener("keydown", e => {
+    keys[e.code] = true;
+    if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code)) e.preventDefault();
+    
+    // Battle Menu navigation
+    if (state.battle.active && state.battle.phase === "menu") {
+        if (e.code === "ArrowUp" || e.code === "KeyW") {
+            state.battle.menu = (state.battle.menu + 2) % 3;
+            playSfx('step');
+        }
+        if (e.code === "ArrowDown" || e.code === "KeyS") {
+            state.battle.menu = (state.battle.menu + 1) % 3;
+            playSfx('step');
+        }
+    }
+
+    if (e.code === "KeyE" || e.code === "Space" || e.code === "Enter") interact();
+    initAudio();
+});
+window.addEventListener("keyup", e => keys[e.code] = false);
+
+// UI Buttons / D-Pad
+document.querySelectorAll(".touch-pad button").forEach(btn => {
+    btn.addEventListener("pointerdown", e => {
+        e.preventDefault(); initAudio();
+        let d = btn.getAttribute("data-dir");
+        let a = btn.getAttribute("data-act");
+        if (state.battle.active && state.battle.phase === "menu") {
+            if (d === "up") { state.battle.menu = (state.battle.menu + 2) % 3; playSfx('step'); }
+            if (d === "down") { state.battle.menu = (state.battle.menu + 1) % 3; playSfx('step'); }
+        } else {
+            if (d === "up") keys["ArrowUp"] = true;
+            if (d === "down") keys["ArrowDown"] = true;
+            if (d === "left") keys["ArrowLeft"] = true;
+            if (d === "right") keys["ArrowRight"] = true;
+        }
+        if (a === "a") interact();
+    });
+    btn.addEventListener("pointerup", e => {
+        e.preventDefault();
+        let d = btn.getAttribute("data-dir");
+        if (d === "up") keys["ArrowUp"] = false;
+        if (d === "down") keys["ArrowDown"] = false;
+        if (d === "left") keys["ArrowLeft"] = false;
+        if (d === "right") keys["ArrowRight"] = false;
+    });
+    btn.addEventListener("pointerleave", e => {
+        let d = btn.getAttribute("data-dir");
+        if (d === "up") keys["ArrowUp"] = false;
+        if (d === "down") keys["ArrowDown"] = false;
+        if (d === "left") keys["ArrowLeft"] = false;
+        if (d === "right") keys["ArrowRight"] = false;
+    });
+});
+
+// --- Main Update Loop ---
+function update() {
+    if (state.gameOver) return;
+    if (state.msgTimer > 0) state.msgTimer--;
+    if (state.interactCooldown > 0) state.interactCooldown--;
+
+    if (state.battle.active) {
+        if (state.battle.phase === "result" && state.battle.resultTimer > 0) {
+            state.battle.resultTimer--;
+            if (state.battle.resultTimer <= 0) {
+                resolveBattle();
+            }
+        }
+        return; // Halt player movement during battle!
+    }
+
+    let dx = 0, dy = 0;
+    if (keys["ArrowUp"] || keys["KeyW"]) { dy -= 1; state.dir = 1; }
+    if (keys["ArrowDown"] || keys["KeyS"]) { dy += 1; state.dir = 0; }
+    if (keys["ArrowLeft"] || keys["KeyA"]) { dx -= 1; state.dir = 2; }
+    if (keys["ArrowRight"] || keys["KeyD"]) { dx += 1; state.dir = 3; }
+
+    if (dx !== 0 && dy !== 0) {
+        dx *= 0.7071; dy *= 0.7071;
+    }
+
+    let spd = state.driving ? DRIVE_SPEED : 3.0;
+    let step = spd * 0.033; // ~30fps delta
+
+    if (dx !== 0 || dy !== 0) {
+        let nx = state.x + dx * step;
+        let ny = state.y + dy * step;
+
+        // X collision
+        if (!isSolid(state.mode, nx, state.y, state.driving) && 
+            !isSolid(state.mode, nx + (dx>0?0.3:-0.3), state.y, state.driving)) {
+            state.x = nx;
+        }
+        // Y collision
+        if (!isSolid(state.mode, state.x, ny, state.driving) && 
+            !isSolid(state.mode, state.x, ny + (dy>0?0.3:-0.3), state.driving)) {
+            state.y = ny;
+        }
+
+        // TRIGGER EVENT: "after driving for a while the car stops and displays oh no rasse unohti pelikortit"
+        if (state.driving && !state.forgotCardsTriggered && state.x > 19.5) {
+            state.forgotCardsTriggered = true;
+            state.driving = false; // Car stops!
+            state.x = 19.5;
+            state.carX = 19.5; state.carY = state.y;
+            showMsg("⚠️ OH NO! Rasse unohti pelikortit! Pitää käydä hakemassa kotoa (ovella Q)!", 480);
+            playSfx('honk');
+            return;
+        }
+
+        if (state.driving) {
+            state.carX = state.x; state.carY = state.y; state.carDir = state.dir;
+        }
+
+        state.stepTimer++;
+        if (state.stepTimer > (state.driving ? 8 : 15)) {
+            state.stepTimer = 0;
+            playSfx(state.driving ? 'engine' : 'step');
+        }
+    }
+}
+
+// --- Rendering ---
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas ? canvas.getContext("2d") : null;
+
+function drawTile(ch, x, y, ix, iy) {
+    if (!ctx) return;
+    let px = x * TILE, py = y * TILE;
+
+    // Base background
+    ctx.fillStyle = PAL.grass;
+    if (state.mode !== "overworld") ctx.fillStyle = "#302820";
+    ctx.fillRect(px, py, TILE, TILE);
+
+    if (ch === 'G') {
+        if ((ix+iy)%2 === 0) { ctx.fillStyle = PAL.grassDark; ctx.fillRect(px+4, py+4, TILE-8, TILE-8); }
+    } else if (ch === 'F') {
+        ctx.fillStyle = PAL.grassDark; ctx.fillRect(px, py, TILE, TILE);
+    } else if (ch === 'O') {
+        ctx.fillStyle = PAL.flower; ctx.beginPath(); ctx.arc(px+24, py+24, 6, 0, 7); ctx.fill();
+    } else if (ch === 'T') {
+        ctx.fillStyle = PAL.grassDark; ctx.fillRect(px, py, TILE, TILE);
+        ctx.fillStyle = PAL.shadow; ctx.beginPath(); ctx.arc(px+26, py+28, 18, 0, 7); ctx.fill();
+        ctx.fillStyle = PAL.treeDark; ctx.beginPath(); ctx.arc(px+24, py+22, 18, 0, 7); ctx.fill();
+        ctx.fillStyle = PAL.tree; ctx.beginPath(); ctx.arc(px+22, py+18, 16, 0, 7); ctx.fill();
+        ctx.fillStyle = PAL.trunk; ctx.fillRect(px+20, py+30, 8, 14);
+    } else if (ch === 'W' || ch === '~') {
+        ctx.fillStyle = ch === '~' ? PAL.waterDeep : PAL.water; ctx.fillRect(px, py, TILE, TILE);
+        ctx.fillStyle = PAL.waterLight; ctx.fillRect(px+8, py+12, 16, 4); ctx.fillRect(px+24, py+32, 12, 4);
+    } else if (ch === 'Y') {
+        ctx.fillStyle = PAL.sand; ctx.fillRect(px, py, TILE, TILE);
+        ctx.fillStyle = PAL.sandDark; ctx.fillRect(px+4, py+4, 8, 8);
+    } else if (ch === 'R' || ch === 'X') {
+        ctx.fillStyle = ch === 'X' ? PAL.highway : PAL.road; ctx.fillRect(px, py, TILE, TILE);
+        ctx.fillStyle = ch === 'X' ? PAL.centerLine : PAL.roadLine;
+        if (ix % 2 === 0) ctx.fillRect(px+22, py, 4, TILE);
+    } else if (ch === '+') {
+        ctx.fillStyle = PAL.water; ctx.fillRect(px, py, TILE, TILE);
+        ctx.fillStyle = PAL.bridge; ctx.fillRect(px+4, py, TILE-8, TILE);
+        ctx.fillStyle = PAL.bridgeDark; ctx.fillRect(px+4, py, 4, TILE); ctx.fillRect(px+TILE-8, py, 4, TILE);
+    } else if (ch === 'P') {
+        ctx.fillStyle = PAL.water; ctx.fillRect(px, py, TILE, TILE);
+        ctx.fillStyle = PAL.pier; ctx.fillRect(px+8, py+8, TILE-16, TILE-16);
+    } else if (ch === 'S' || ch === 'C' || ch === 'H') {
+        ctx.fillStyle = PAL.shadow; ctx.fillRect(px+4, py+6, TILE-4, TILE-4);
+        ctx.fillStyle = ch === 'S' ? PAL.storeWall : (ch === 'C' ? PAL.cotWall : PAL.homeWall);
+        ctx.fillRect(px+2, py+2, TILE-4, TILE-4);
+        ctx.fillStyle = ch === 'S' ? PAL.storeRoof : (ch === 'C' ? PAL.cotRoof : PAL.homeRoof);
+        ctx.fillRect(px+6, py+6, TILE-12, TILE-12);
+    } else if (ch === 'E' || ch === 'D' || ch === 'Q') {
+        ctx.fillStyle = PAL.road; ctx.fillRect(px, py, TILE, TILE);
+        ctx.fillStyle = PAL.door; ctx.fillRect(px+8, py+4, TILE-16, TILE-8);
+        ctx.fillStyle = "#ffd700"; ctx.beginPath(); ctx.arc(px+32, py+24, 3, 0, 7); ctx.fill();
+    } else if (ch === 'V') {
+        // BMW CAR & DRIVER BLOCKING INTERSECTION
+        ctx.fillStyle = PAL.road; ctx.fillRect(px, py, TILE, TILE);
+        ctx.fillStyle = "#000080"; ctx.fillRect(px+6, py+10, TILE-12, TILE-20); // BMW Body
+        ctx.fillStyle = "#FFFFFF"; ctx.fillRect(px+10, py+12, 10, 6); // windshield
+        ctx.fillStyle = "#FF0000"; ctx.beginPath(); ctx.arc(px+34, py+24, 6, 0, 7); ctx.fill(); // Aggressive Driver head
+    } else if (ch === 'B') {
+        ctx.fillStyle = "#555"; ctx.fillRect(px+6, py+6, TILE-12, TILE-12);
+        ctx.fillStyle = "#ff4500"; ctx.fillRect(px+12, py+12, TILE-24, TILE-24);
+    }
+}
+
+function drawCar(camX, camY) {
+    if (!ctx) return;
+    let px = (state.carX - camX) * TILE;
+    let py = (state.carY - camY) * TILE;
+
+    ctx.save();
+    ctx.translate(px, py);
+    if (state.carDir === 1) ctx.rotate(-Math.PI/2);
+    else if (state.carDir === 2) ctx.rotate(Math.PI);
+    else if (state.carDir === 3) ctx.rotate(0);
+    else ctx.rotate(Math.PI/2);
+
+    ctx.fillStyle = PAL.shadow; ctx.fillRect(-20, -14, 40, 28);
+    ctx.fillStyle = PAL.wheel; 
+    ctx.fillRect(-16, -16, 8, 4); ctx.fillRect(8, -16, 8, 4);
+    ctx.fillRect(-16, 12, 8, 4); ctx.fillRect(8, 12, 8, 4);
+
+    ctx.fillStyle = PAL.carBody; ctx.fillRect(-18, -12, 36, 24);
+    ctx.fillStyle = PAL.carDark; ctx.fillRect(-10, -10, 20, 20);
+    ctx.fillStyle = PAL.carGlass; ctx.fillRect(2, -8, 8, 16); ctx.fillRect(-14, -8, 6, 16);
+    ctx.fillStyle = PAL.light; ctx.fillRect(16, -10, 3, 5); ctx.fillRect(16, 5, 3, 5);
+    ctx.restore();
+}
+
+function drawPlayer(camX, camY) {
+    if (!ctx) return;
+    if (state.driving) return; // Hidden inside car
+
+    let px = (state.x - camX) * TILE;
+    let py = (state.y - camY) * TILE;
+
+    ctx.save();
+    ctx.translate(px, py);
+
+    ctx.fillStyle = PAL.shadow; ctx.beginPath(); ctx.arc(2, 4, 12, 0, 7); ctx.fill();
+    ctx.fillStyle = "#204080"; ctx.fillRect(-8, 2, 6, 12); ctx.fillRect(2, 2, 6, 12);
+    ctx.fillStyle = "#d83030"; ctx.fillRect(-10, -8, 20, 14);
+    ctx.fillStyle = "#ffcc99"; ctx.beginPath(); ctx.arc(0, -12, 8, 0, 7); ctx.fill();
+    ctx.fillStyle = "#503010"; ctx.beginPath(); ctx.arc(0, -14, 8, Math.PI, 0); ctx.fill();
+    if (state.dir === 0) {
+        ctx.fillStyle = "#000"; ctx.fillRect(-4, -12, 2, 2); ctx.fillRect(2, -12, 2, 2);
+    }
+    ctx.restore();
+}
+
+function drawUI() {
+    if (!ctx) return;
+    // Top-left status box
+    ctx.fillStyle = PAL.uiBg; ctx.fillRect(10, 10, 420, 44);
+    ctx.lineWidth = 2; ctx.strokeStyle = PAL.uiBorder; ctx.strokeRect(10, 10, 420, 44);
+
+    ctx.fillStyle = PAL.uiText; ctx.font = "bold 13px 'Courier New', monospace";
+    let cardsText = state.hasCards ? "[🃏 YES]" : "[🃏 NO]";
+    let beerText = state.hasBeer ? "[🍺 YES]" : "[🍺 NO]";
+    let vehText = state.driving ? " (CAR 🚗)" : "";
+    ctx.fillText("LOC:" + state.mode.toUpperCase() + vehText + " CARDS:" + cardsText + " BEER:" + beerText, 16, 36);
+
+    // Message box at bottom
+    if (state.msgTimer > 0 || state.gameOver) {
+        ctx.fillStyle = PAL.uiBg; ctx.fillRect(10, SH - 52, SW - 20, 42);
+        ctx.strokeRect(10, SH - 52, SW - 20, 42);
+        ctx.fillStyle = state.gameOver ? "#000080" : PAL.uiText;
+        ctx.font = "bold 13px 'Courier New', monospace";
+        ctx.fillText(state.msg, 18, SH - 26);
+    }
+
+    // ORIGINAL BMW 3-OPTION BATTLE DIALOG OVERLAY!
+    if (state.battle.active) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+        ctx.fillRect(0, 0, SW, SH);
+
+        // Main Dialog Window
+        ctx.fillStyle = "#C0C0C0";
+        ctx.fillRect(40, 60, SW - 80, SH - 120);
+        ctx.lineWidth = 4; ctx.strokeStyle = "#000000"; ctx.strokeRect(40, 60, SW - 80, SH - 120);
+        
+        // Window Title Bar
+        ctx.fillStyle = "#000080"; ctx.fillRect(44, 64, SW - 88, 28);
+        ctx.fillStyle = "#FFFFFF"; ctx.font = "bold 16px 'Courier New', monospace";
+        ctx.fillText("■ DOKATHLON OS // TIELIIKENNEVÄITTELY (X:30, Y:49)", 54, 83);
+
+        // Encounter text
+        ctx.fillStyle = "#000000"; ctx.font = "bold 16px 'Courier New', monospace";
+        ctx.fillText(state.battle.msg, 60, 130);
+        ctx.fillText("HP: " + state.hp + " / " + state.maxHp, 60, 160);
+
+        if (state.battle.phase === "menu") {
+            ctx.fillStyle = "#000080"; ctx.font = "bold 18px 'Courier New', monospace";
+            ctx.fillText("VALITSE TOIMINTO (Ylös/Alas nuolilla, valitse A/Välilyönti):", 60, 210);
+
+            const opts = [
+                "[0] Jarrutesti (BMW väistää ojaan, HP -15)",
+                "[1] Keskisormi (Kuski polttaa päreensä ja ohittaa, HP -5)",
+                "[2] Ignoraa (Täydellinen suoritus, BMW kyllästyy ja ajaa ohi)"
+            ];
+
+            for (let i = 0; i < 3; i++) {
+                let boxY = 240 + i * 55;
+                ctx.fillStyle = (i === state.battle.menu) ? "#FFFF00" : "#FFFFFF";
+                ctx.fillRect(60, boxY, SW - 120, 45);
+                ctx.lineWidth = 2; ctx.strokeStyle = "#000000"; ctx.strokeRect(60, boxY, SW - 120, 45);
+
+                ctx.fillStyle = "#000000"; ctx.font = "bold 15px 'Courier New', monospace";
+                let prefix = (i === state.battle.menu) ? "► " : "  ";
+                ctx.fillText(prefix + opts[i], 75, boxY + 28);
+            }
+        } else if (state.battle.phase === "result") {
+            ctx.fillStyle = "#008000"; ctx.font = "bold 20px 'Courier New', monospace";
+            ctx.fillText("► VALINTA SUORITETTU! Jatkuu matka hetken kuluttua...", 60, 260);
+            ctx.fillStyle = "#000000"; ctx.font = "bold 14px 'Courier New', monospace";
+            ctx.fillText("(Paina Välilyöntiä / A poistuaksesi heti)", 60, 300);
+        }
+    }
+
+    // VICTORY OVERLAY WHEN GAME ENDS!
+    if (state.gameOver) {
+        ctx.fillStyle = "rgba(0, 0, 128, 0.88)";
+        ctx.fillRect(50, 100, SW - 100, SH - 200);
+        ctx.lineWidth = 4; ctx.strokeStyle = "#FFFF00"; ctx.strokeRect(50, 100, SW - 100, SH - 200);
+        ctx.fillStyle = "#FFFF00"; ctx.font = "bold 26px 'Courier New', monospace"; ctx.textAlign = "center";
+        ctx.fillText("🏆 MISSION COMPLETED! 🏆", SW / 2, 170);
+        ctx.fillStyle = "#FFFFFF"; ctx.font = "bold 16px 'Courier New', monospace";
+        ctx.fillText("Astuit mökille juomien & pelikorttien kanssa!", SW / 2, 220);
+        ctx.fillText("Dokathlon 2026 -turnaus alkaa virallisesti!", SW / 2, 255);
+        ctx.fillStyle = "#00FF00"; ctx.font = "bold 22px 'Courier New', monospace";
+        ctx.fillText("★ VIITTO / VICTORY ★", SW / 2, 315);
+        ctx.textAlign = "left";
+    }
+}
+
+function render() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, SW, SH);
+
+    let camX = state.x - VIEW_W / 2;
+    let camY = state.y - VIEW_H / 2;
+
+    for (let iy = 0; iy < VIEW_H + 2; iy++) {
+        for (let ix = 0; ix < VIEW_W + 2; ix++) {
+            let mapX = Math.floor(camX + ix);
+            let mapY = Math.floor(camY + iy);
+            let ch = getTile(state.mode, mapX, mapY);
+            let drawX = (mapX - camX);
+            let drawY = (mapY - camY);
+            drawTile(ch, drawX, drawY, mapX, mapY);
+        }
+    }
+
+    if (state.mode === "overworld") drawCar(camX, camY);
+    drawPlayer(camX, camY);
+    drawUI();
+}
+
+function loop() {
+    update();
+    render();
+    requestAnimationFrame(loop);
+}
+
+loop();
+
+})();
+</script>
+<script src="warez.js"></script>
 </body>
 </html>
