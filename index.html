@@ -479,7 +479,7 @@ function interact() {
         let ft = getTile("cottage", frontX, frontY);
         let ct = getTile("cottage", state.x, state.y);
         if (ft === 'T' || ft === 'F') {
-            showMsg("Ahhh... Saunan löylyt ovat täydelliset! VIITTO!");
+            showMsg("Ahhh... Saunan löylyt ovat täydelliset! VOITTO!");
             playSfx('win'); return;
         }
         if (ft === 'D' || ct === 'D' || state.y > 5.8) {
@@ -602,7 +602,7 @@ function update() {
         if (state.driving && !state.forgotCardsTriggered && state.x > 19.5) {
             state.forgotCardsTriggered = true;
             state.x = 19.5;
-            showMsg("⚠️ OH NO! Rasse unohti pelikortit! Aja takaisin kotiin hakemaan ne (Q)!", 480);
+            showMsg("⚠️ OH NO! Rasse unohti pelikortit, mene takaisin kotiin hakemaan ne (Q)!", 480);
             playSfx('honk');
             return;
         }
@@ -808,7 +808,7 @@ function drawUI() {
         ctx.fillText("Astuit mökille juomien & pelikorttien kanssa!", SW / 2, 220);
         ctx.fillText("Dokathlon 2026 -turnaus alkaa virallisesti!", SW / 2, 255);
         ctx.fillStyle = "#00FF00"; ctx.font = "bold 22px 'Courier New', monospace";
-        ctx.fillText("★ VIITTO / VICTORY ★", SW / 2, 315);
+        ctx.fillText("★ VOITTO / VICTORY ★", SW / 2, 315);
         ctx.textAlign = "left";
     }
 }
