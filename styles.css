@@ -182,8 +182,8 @@ nav a:hover .nav-label, nav a.active .nav-label {
 /* --- HOMEPAGE ONE STARTING SCREEN VIEW (No Scrolling, Perfectly Aligned) --- */
 .starting-screen-view {
     margin-left: 130px; /* 95px nav column + padding */
-    height: calc(100vh - 44px);
-    overflow: hidden;
+    min-height: calc(100vh - 44px);
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -194,8 +194,8 @@ nav a:hover .nav-label, nav a.active .nav-label {
 }
 
 .starting-screen-header, .starting-game-area {
-    width: min(96vw, 720px);
-    max-width: 720px;
+    width: min(96vw, 1024px);
+    max-width: 1024px;
     margin: 0 auto;
     box-sizing: border-box;
 }
@@ -243,7 +243,7 @@ nav a:hover .nav-label, nav a.active .nav-label {
 }
 
 .starting-game-area #gameCanvas {
-    height: min(52vh, 430px);
+    height: auto;
     width: 100%;
     border: 4px inset #FFFFFF;
     box-shadow: 6px 6px 0px rgba(0,0,0,0.6);
@@ -664,8 +664,9 @@ img.P4Phero {
 }
 
 #gameCanvas {
-    width: min(96vw, 720px);
+    width: min(96vw, 1024px);
     height: auto;
+    aspect-ratio: 720 / 528;
     image-rendering: pixelated;
     border: 4px inset #FFFFFF;
     background: #000000;
@@ -685,6 +686,8 @@ img.P4Phero {
     gap: 30px;
     align-items: center;
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
     margin-top: 6px;
 }
 
@@ -704,6 +707,9 @@ img.P4Phero {
     color: #000000;
     box-shadow: inset 1px 1px 0 #FFFFFF, inset -1px -1px 0 #808080, 2px 2px 0px #000000;
     touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
     cursor: pointer;
     transition: none;
 }
