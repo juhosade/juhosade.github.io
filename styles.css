@@ -974,6 +974,23 @@ footer {
 /* --- Responsive Styles --- */
 @media (max-width: 900px) {
     .starting-screen-view { margin-left: 0; padding: 10px; height: auto; overflow: visible; }
-    nav { position: relative !important; top: auto !important; left: auto !important; width: 100% !important; flex-direction: row !important; justify-content: center !important; margin: 15px auto !important; }
+    nav { position: relative !important; top: auto !important; left: auto !important; width: 100% !important; flex-direction: row !important; flex-wrap: wrap !important; justify-content: center !important; margin: 15px auto !important; }
     .container, .containerP4P { margin-left: auto; width: 95%; }
+}
+
+@media (max-width: 500px) {
+    header::before, .hero::before {
+        content: "■ [Start] OS v20.26";
+        font-size: 11px;
+        padding: 4px 6px;
+    }
+    header::after, .hero::after {
+        display: none !important;
+    }
+    nav a {
+        width: 70px !important;
+    }
+    .nav-label {
+        font-size: 9px !important;
+    }
 }

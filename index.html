@@ -601,10 +601,8 @@ function update() {
         // TRIGGER EVENT: "after driving for a while the car stops and displays oh no rasse unohti pelikortit"
         if (state.driving && !state.forgotCardsTriggered && state.x > 19.5) {
             state.forgotCardsTriggered = true;
-            state.driving = false; // Car stops!
             state.x = 19.5;
-            state.carX = 19.5; state.carY = state.y;
-            showMsg("⚠️ OH NO! Rasse unohti pelikortit! Pitää käydä hakemassa kotoa (ovella Q)!", 480);
+            showMsg("⚠️ OH NO! Rasse unohti pelikortit! Aja takaisin kotiin hakemaan ne (Q)!", 480);
             playSfx('honk');
             return;
         }
