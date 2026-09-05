@@ -95,7 +95,7 @@
         function calculatePoints(results, headers) {
             const points = {};
             const eventCount = headers.length - 1;
-            const eventTypes = [1, 1, 0, 0, 1, 0, 1];
+            const eventTypes = [1, 1, 0, 0, 1, 0, 1, 1]; // 1=lowest wins, 0=highest wins
 
             results.forEach(row => {
                 const participant = row[0];
