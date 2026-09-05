@@ -25,7 +25,7 @@
         <div class="content">
             <h2>Tulokset</h2>
             <p>Täältä löydät tulokset eri kilpailutapahtumista. Kilpailijat saavat pisteitä suoritustensa perusteella,
-                ja ne on laskettu taulukkoon alla. Kilpailusuoritus pisteytetään antamalla voittajalle 20 pistettä ja
+                ja ne on laskettu taulukkoon alla. Kilpailusuoritus pisteytetään antamalla voittajalle maksimipisteet (osallistujamäärän mukaan) ja
                 lajin viimeiselle yksi piste. Tasatilanteessa molemmat osallistujat saavat korkeamman pistemäärän.</p>
             <div class="results-table">
                 <h3>Tapahtumatulokset</h3>
@@ -91,9 +91,9 @@
             }
         }
 
-        function calculatePoints(results) {
+        function calculatePoints(results, headers) {
             const points = {};
-            const eventCount = results[0].length - 1;
+            const eventCount = headers.length - 1;
             const eventTypes = [1, 1, 0, 0, 1, 0, 0, 0, 0, 1];
 
             results.forEach(row => {
@@ -101,7 +101,19 @@
                 const scores = Array(eventCount).fill(null);
                 for (let i = 0; i < eventCount; i++) {
                     if (row[i + 1] !== undefined && row[i + 1] !== "") {
-                        scores[i] = Number(row[i + 1].toString().replace(',', '.'));
+                        let valStr = row[i + 1].toString().trim();
+                        if (/^\d{1,2}(:\d{2})+$/.test(valStr)) {
+                            let parts = valStr.split(':').map(Number);
+                            let seconds = 0;
+                            if (parts.length === 3) {
+                                seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+                            } else if (parts.length === 2) {
+                                seconds = parts[0] * 60 + parts[1];
+                            }
+                            scores[i] = seconds;
+                        } else {
+                            scores[i] = Number(valStr.replace(',', '.'));
+                        }
                     }
                 }
 
@@ -127,7 +139,7 @@
                     return eventTypes[eventIndex] ? a.score - b.score : b.score - a.score;
                 });
 
-                let currentPoints = 20;
+                let currentPoints = results.length;
                 let lastScore = null;
                 let tieCount = 0;
 
@@ -167,7 +179,7 @@
             const pointsTableBody = document.querySelector('#pointsTable tbody');
 
             const headers = data[0].values[0];
-            const results = data.slice(1).flatMap(range => range.values);
+            const results = data.slice(1).flatMap(range => range.values).filter(row => row.length > 0 && row[0] !== "");
 
             // Populate Event Results Table
             headers.forEach(header => {
@@ -178,15 +190,15 @@
 
             results.forEach(row => {
                 const rowElement = document.createElement('tr');
-                row.forEach(cell => {
+                for (let i = 0; i < headers.length; i++) {
                     const cellElement = document.createElement('td');
-                    cellElement.textContent = cell;
+                    cellElement.textContent = row[i] !== undefined ? row[i] : "";
                     rowElement.appendChild(cellElement);
-                });
+                }
                 eventResultsTableBody.appendChild(rowElement);
             });
 
-            const points = calculatePoints(results);
+            const points = calculatePoints(results, headers);
             const participants = Object.keys(points);
 
             pointsTableHead.innerHTML = `
