@@ -25,7 +25,7 @@
         <div class="content">
             <h2>Tulokset</h2>
             <p>Täältä löydät tulokset eri kilpailutapahtumista. Kilpailijat saavat pisteitä suoritustensa perusteella,
-                ja ne on laskettu taulukkoon alla. Kilpailusuoritus pisteytetään antamalla voittajalle 19 pistettä ja
+                ja ne on laskettu taulukkoon alla. Kilpailusuoritus pisteytetään antamalla voittajalle 20 pistettä ja
                 lajin viimeiselle yksi piste. Tasatilanteessa molemmat osallistujat saavat korkeamman pistemäärän.</p>
             <div class="results-table">
                 <h3>Tapahtumatulokset</h3>
@@ -94,11 +94,16 @@
         function calculatePoints(results) {
             const points = {};
             const eventCount = results[0].length - 1;
-            const eventTypes = [0, 0, 0, 1, 1, 0, 0, 0, 0, 1];
+            const eventTypes = [1, 1, 0, 0, 1, 0, 0, 0, 0, 1];
 
             results.forEach(row => {
                 const participant = row[0];
-                const scores = row.slice(1).map(score => score ? Number(score) : 0);
+                const scores = Array(eventCount).fill(null);
+                for (let i = 0; i < eventCount; i++) {
+                    if (row[i + 1] !== undefined && row[i + 1] !== "") {
+                        scores[i] = Number(row[i + 1].toString().replace(',', '.'));
+                    }
+                }
 
                 if (!points[participant]) {
                     points[participant] = {
@@ -116,16 +121,20 @@
                     score: data.scores[eventIndex]
                 }));
 
-                eventScores.sort((a, b) => eventTypes[eventIndex] ? a.score - b.score : b.score - a.score);
+                eventScores.sort((a, b) => {
+                    if (a.score === null || isNaN(a.score)) return 1;
+                    if (b.score === null || isNaN(b.score)) return -1;
+                    return eventTypes[eventIndex] ? a.score - b.score : b.score - a.score;
+                });
 
-                let currentPoints = 19;
+                let currentPoints = 20;
                 let lastScore = null;
                 let tieCount = 0;
 
                 eventScores.forEach((entry, idx) => {
                     const { participant, score } = entry;
 
-                    if (score === 0) {
+                    if (score === null || isNaN(score)) {
                         points[participant].eventPoints[eventIndex] = 0;
                         return;
                     }
@@ -158,7 +167,7 @@
             const pointsTableBody = document.querySelector('#pointsTable tbody');
 
             const headers = data[0].values[0];
-            const results = data.slice(1).flatMap(range => range.values.slice(1));
+            const results = data.slice(1).flatMap(range => range.values);
 
             // Populate Event Results Table
             headers.forEach(header => {
